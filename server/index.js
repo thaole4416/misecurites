@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
+const sanGiaoDichRoute = require("./routes/sanGiaoDich.route");
+
 require('dotenv').config({path: './.env'})
 
 const app = express();
@@ -17,5 +19,8 @@ const connection = mongoose.connection;
 connection.once("open", () =>
   console.log("MongoDB database connection etablished successfully")
 );
+
+app.use("/api/sanGiaoDich", sanGiaoDichRoute);
+
 
 app.listen(port, () => console.log(`Server is running on port ${port}`));

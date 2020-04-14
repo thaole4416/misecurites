@@ -1,0 +1,58 @@
+.header {
+    width: 100%;
+    height: 40px;
+    background-color: #181818;
+    color: white;
+}
+
+.header .div{
+    color: #c1d1d1;
+    font-size: 12px;
+    display: block;
+    float: left;
+    margin: 10px 20px 0 20px;
+}
+
+.header .flag .vi {
+      margin-left: 5px;
+  border: #111111;
+  background-image: url("./../img//Vietnam.png");
+}
+
+  
+  .header img {
+    float: left;
+    margin: 5px 10px 0 20px;
+    /* height: 18px; */
+  }
+  
+  .header .div {
+    color: #c1d1d1;
+    font-size: 12px;
+    display: block;
+    float: left;
+    margin: 10px 20px 0 20px;
+  }
+  
+  .header .flag span {
+    margin: 10px 10px 0px 0px;
+    display: block;
+    float: right;
+    width: 32px;
+    height: 20px;
+  }
+
+  .header .login {
+    float: right;
+    font-size: 14px;
+  }
+  
+  .header .login a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .header .login a:hover {
+    color: #3d8de0;
+  }
+  

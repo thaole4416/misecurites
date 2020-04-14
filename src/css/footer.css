@@ -1,0 +1,21 @@
+.footer {
+    background-color: #181818;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 0;
+    padding-top: 3px;
+    text-align: center;
+    height: 23px;
+}
+
+.td-ft {
+    display: block;
+    /* margin: auto; */
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    width: 100%;
+    /* background-color: red; */
+}
