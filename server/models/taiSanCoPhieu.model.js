@@ -12,7 +12,7 @@ const taiSanCoPhieuSchema = new Schema(
     maCoPhieu: { type: String, required: true, ref: "CoPhieu" },
     khoiLuong: { type: Number, required: true },
   },
-  { timestamps: true }
+  { timestamps: true ,collection: 'TaiSanCoPhieu'}
 );
 
 const TaiSanCoPhieu = mongoose.model("TaiSanCoPhieu", taiSanCoPhieuSchema);

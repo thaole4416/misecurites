@@ -17,7 +17,7 @@ const giaoDichKhopSchema = new Schema(
     KhoiLuong: { type: Number, required: true },
     Gia: { type: Number, required: true },
   },
-  { timestamps: true }
+  { timestamps: true,collection: 'GiaoDichKhop' }
 );
 
 const GiaoDichKhop = mongoose.model("GiaoDichKhop", giaoDichKhopSchema);

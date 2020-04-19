@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 
 const taiKhoanSchema = new Schema(
   {
+    _id: {type: String},
     tenTaiKhoan: {type: String,required: true},
     tenDangNhap: { type: String, required: true },
     matKhau: { type: String, required: true },
@@ -15,7 +16,7 @@ const taiKhoanSchema = new Schema(
     soDienThoai: { type: Number, required: true },
     email: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true ,collection: 'TaiKhoan'}
 );
 
 const TaiKhoan = mongoose.model("TaiKhoan", taiKhoanSchema);

@@ -7,7 +7,7 @@ const taiSanTienSchema = new Schema(
     maTaiKhoan: {type: Schema.Types.ObjectId, ref: 'TaiKhoan'},
     soDu: { type: Number, required: true },
   },
-  { timestamps: true }
+  { timestamps: true,collection: 'TaiSanTien' }
 );
 
 const TaiSanTien = mongoose.model("TaiSanTien", taiSanTienSchema);

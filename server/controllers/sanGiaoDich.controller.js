@@ -1,4 +1,3 @@
-const router = require("express").Router();
 let SanGiaoDich = require("../models/sanGiaoDich.model");
 
 let getAll = (req, res) => {

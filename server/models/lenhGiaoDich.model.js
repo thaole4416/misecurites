@@ -15,7 +15,7 @@ const lenhGiaoDichSchema = new Schema(
     gia: { type: Number, required: true },
     trangThai: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true,collection: 'LenhGiaoDich' }
 );
 
 const LenhGiaoDich = mongoose.model("LenhGiaoDich", lenhGiaoDichSchema);
