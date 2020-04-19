@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import  Thead from "./priceboard.thead";
+import Tbody from "./priceboard.tbody";
 
 class StocksTable extends Component {
   constructor(props) {
@@ -9,8 +11,9 @@ class StocksTable extends Component {
 
   render() {
     return (
-        <div>
-            Phần bảng giá ở đây
+        <div className="full-width-div" id="stocks_list">
+            <Thead/>
+            <Tbody/>
         </div>
     );
   }

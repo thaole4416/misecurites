@@ -1,0 +1,50 @@
+body {
+    height: 100vh;
+    background-color: #222;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.card-header {
+    background: #4a4a4a;
+    border-radius: 1px;
+}
+
+.card-header-title {
+    color: white !important;
+}
+
+#stocks_list .card-content {
+    background-color: #222222;
+}
+
+.red {
+    color: #ea0713;
+}
+
+.green {
+    color: #06f506;
+}
+
+.blue {
+    color: #3abbff;
+}
+
+.yellow {
+    color: #c5f100;
+}
+
+.purple {
+    color: #e200da;
+}
+
+.white {
+    color: white;
+}
+
+.color1 {
+    background-color: #1d1c1c;
+}
+
+.color2 {
+    background-color: #282828;
+}

@@ -2,8 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.css'; 
+import './css/app.css'
 import './css/header.css'
 import './css/footer.css'
+import './css/priceboard.css'
 
 ReactDOM.render(
   <React.StrictMode>

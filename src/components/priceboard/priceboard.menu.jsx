@@ -15,9 +15,9 @@ class Menu extends Component {
           <i className="fas fa-plus"></i>
         </button>
 
-        <button className="btn-menu  btn-exchange">HOSE</button>
-        <button className="btn-menu  btn-exchange">HNX</button>
-        <button className="btn-menu btn-exchange">UPCOM</button>
+        <button className="btn-menu">HOSE</button>
+        <button className="btn-menu">HNX</button>
+        <button className="btn-menu">UPCOM</button>
         <button className="btn-menu order">
           Đặt lệnh <i className="fas fa-plus"></i>
         </button>
