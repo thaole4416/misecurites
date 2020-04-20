@@ -10,12 +10,17 @@ class Header extends Component {
 
   render() {
     let loginPopupStyle = {
-      backgroundColor: "292929",
+      backgroundColor: "black",
       width: "30%",
       marginLeft: "-35%",
       left: "70%",
     };
-    let registerPopupStyle = {};
+    let registerPopupStyle = {
+      backgroundColor: "black",
+      width: "70%",
+      marginLeft: "-15%",
+      left: "30%",
+    };
     let loginPopup = (
       <div className="login-form">
         <form action="/examples/actions/confirmation.php" method="post">
@@ -57,26 +62,84 @@ class Header extends Component {
     );
     let registerPopup = (
       <form action="/examples/actions/confirmation.php" method="post">
-        <h2>Sign Up</h2>
-        <p>Please fill in this form to create an account!</p>
-        <hr />
         <div className="form-group">
           <div className="row">
-            <div className="col-xs-6">
+            <div className="col-4">
               <input
                 type="text"
                 className="form-control"
-                name="first_name"
-                placeholder="First Name"
+                name="tenTaiKhoan"
+                placeholder="Họ và tên"
                 required="required"
               />
             </div>
-            <div className="col-xs-6">
+            <div className="col-4">
               <input
                 type="text"
                 className="form-control"
-                name="last_name"
-                placeholder="Last Name"
+                name="ngaySinh"
+                placeholder="Ngày sinh"
+                required="required"
+              />
+            </div>
+            <div className="col-4">
+              <label class="form-check-label mr-5" for="radio1">
+                Giới tính
+              </label>
+              <div class="form-check-inline">
+                <label class="form-check-label" for="radio1">
+                  <input
+                    type="radio"
+                    class="form-check-input"
+                    id="radio1"
+                    name="optradio"
+                    value="option1"
+                    checked
+                  />
+                  Nam
+                </label>
+              </div>
+              <div class="form-check-inline">
+                <label class="form-check-label" for="radio2">
+                  <input
+                    type="radio"
+                    class="form-check-input"
+                    id="radio2"
+                    name="optradio"
+                    value="option2"
+                  />
+                  Nữ
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="form-group">
+          <div className="row">
+            <div className="col-4">
+              <input
+                type="text"
+                className="form-control"
+                name="CMND"
+                placeholder="CMND"
+                required="required"
+              />
+            </div>
+            <div className="col-4">
+              <input
+                type="text"
+                className="form-control"
+                name="ngayCap"
+                placeholder="Ngày cấp"
+                required="required"
+              />
+            </div>
+            <div className="col-4">
+              <input
+                type="text"
+                className="form-control"
+                name="noiCap"
+                placeholder="Nơi cấp"
                 required="required"
               />
             </div>
@@ -84,40 +147,80 @@ class Header extends Component {
         </div>
         <div className="form-group">
           <input
-            type="email"
+            type="text"
             className="form-control"
-            name="email"
-            placeholder="Email"
+            name="diaChi"
+            placeholder="Địa chỉ"
             required="required"
           />
         </div>
         <div className="form-group">
-          <input
-            type="password"
-            className="form-control"
-            name="password"
-            placeholder="Password"
-            required="required"
-          />
+          <div className="row">
+            <div className="col-6">
+              <input
+                type="text"
+                className="form-control"
+                name="soDienThoai"
+                placeholder="Số điện thoại"
+                required="required"
+              />
+            </div>
+            <div className="col-6">
+              <input
+                type="text"
+                className="form-control"
+                name="email"
+                placeholder="Email"
+                required="required"
+              />
+            </div>
+          </div>
         </div>
         <div className="form-group">
-          <input
-            type="password"
-            className="form-control"
-            name="confirm_password"
-            placeholder="Confirm Password"
-            required="required"
-          />
+          <div className="row">
+            <div className="col-4">
+              <input
+                type="text"
+                className="form-control"
+                name="tenDangNhap"
+                placeholder="Tên đăng nhập"
+                required="required"
+              />
+            </div>
+            <div className="col-4">
+              <input
+                type="password"
+                className="form-control"
+                name="matKhau"
+                placeholder="Mật khẩu"
+                required="required"
+              />
+            </div>
+            <div className="col-4">
+              <input
+                type="password"
+                className="form-control"
+                name="matKhau2"
+                placeholder="Nhập lại mật khẩu"
+                required="required"
+              />
+            </div>
+          </div>
         </div>
         <div className="form-group">
-          <label className="checkbox-inline">
-            <input type="checkbox" required="required" /> I accept the{" "}
-            <a href="javascipt:void(0)">Terms of Use</a> &amp; <a href="javascipt:void(0)">Privacy Policy</a>
+          <label className="checkbox-inline" for="accept">
+            <input
+              type="checkbox"
+              required="required"
+              name="accept"
+              id="accept"
+            />{" "}
+            Tôi đồng ý các điều khoản dịch vụ.
           </label>
         </div>
         <div className="form-group">
           <button type="submit" className="btn btn-primary btn-lg">
-            Sign Up
+            Đăng ký
           </button>
         </div>
       </form>

@@ -21,8 +21,8 @@
     /* border-radius: 5px; */
 }
 
-menu .active{
-    background-color: rgb(247, 148, 29);
+.menu .active{
+    background-color: #f7941d!important;
 }
 
 .menu .input {
@@ -38,7 +38,6 @@ menu .active{
 .menu .order {
     width: 95px;
     float: right;
-    background-color: #f7941d;
 }
 
 .menu button{

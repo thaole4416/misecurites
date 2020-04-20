@@ -15,7 +15,7 @@ class Menu extends Component {
           <i className="fas fa-plus"></i>
         </button>
 
-        <button className="btn-menu">HOSE</button>
+        <button className="btn-menu active">HOSE</button>
         <button className="btn-menu">HNX</button>
         <button className="btn-menu">UPCOM</button>
         <button className="btn-menu order">

@@ -12,6 +12,9 @@ const base_uri = "/coPhieu";
 "giaThamChieu":24500
 }
  */
+route.get(base_uri + "/", coPhieuController.getAll);
+route.get(base_uri + "/searchByExchangeId/:maSan", coPhieuController.searchByExchangeId);
+route.get(base_uri + "/searchById/:id", coPhieuController.searchById);
 route.post(base_uri + "/", coPhieuController.create);
 
 module.exports = route;

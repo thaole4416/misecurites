@@ -16,9 +16,30 @@ let create = (req, res) => {
   coPhieu
     .save(req)
     .then(() => res.json("Them thanh cong co phieu!"))
-    .catch((err) => res.json({"Error: ": err.toString()}));
+    .catch((err) => res.json({ "Error: ": err.toString() }));
+};
+
+let getAll = (req, res) => {
+  CoPhieu.find()
+    .then((coPhieu) => res.json(coPhieu))
+    .catch((err) => res.status(400).json("Error: " + err));
+};
+
+let searchByExchangeId = async (req, res) => {
+  let maSan = req.params.maSan;
+  let coPhieus = await CoPhieu.find({ maSan: maSan });
+  res.json({ stocks: coPhieus });
+};
+
+let searchById = async (req, res) => {
+  let id = req.params.id;
+  let coPhieu = await CoPhieu.find({ _id: id });
+  res.json({ stock: coPhieu });
 };
 
 module.exports = {
   create: create,
+  getAll: getAll,
+  searchById: searchById,
+  searchByExchangeId:searchByExchangeId
 };
