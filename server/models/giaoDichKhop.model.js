@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const Util = require('../utils')
 const Schema = mongoose.Schema;
 
 const giaoDichKhopSchema = new Schema(
@@ -14,10 +14,12 @@ const giaoDichKhopSchema = new Schema(
       required: true,
       ref: 'LenhGiaoDich'
     },
-    KhoiLuong: { type: Number, required: true },
-    Gia: { type: Number, required: true },
+    khoiLuong: { type: Number, required: true },
+    gia: { type: Number, required: true },
+    createdDay: { type: String, default: Util.getToday()},
+    matchedTime : {type: Number, default: Date.now()}
   },
-  { timestamps: true,collection: 'GiaoDichKhop' }
+  { collection: 'GiaoDichKhop' }
 );
 
 const GiaoDichKhop = mongoose.model("GiaoDichKhop", giaoDichKhopSchema);

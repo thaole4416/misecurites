@@ -3,7 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const authMiddleware = require("./middlewares/auth.middleware");
-
+const emitter = require('./emitter')
 // const sanGiaoDichRoute = require("./routes/sanGiaoDich.route");
 // const taiKhoanRoute = require("./routes/taiKhoan.route");
 const routes = require("./routes");
@@ -33,5 +33,4 @@ connection.once("open", () =>
 // app.use("/api/sanGiaoDich/", authMiddleware.requireAuth,sanGiaoDichRoute);
 // app.use("/api/taiKhoan",taiKhoanRoute);
 app.use("/api", routes);
-
 app.listen(port, () => console.log(`Server is running on port ${port}`));
