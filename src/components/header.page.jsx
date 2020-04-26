@@ -83,14 +83,14 @@ class Header extends Component {
               />
             </div>
             <div className="col-4">
-              <label class="form-check-label mr-5" for="radio1">
+              <label className="form-check-label mr-5" htmlFor="radio1">
                 Giới tính
               </label>
-              <div class="form-check-inline">
-                <label class="form-check-label" for="radio1">
+              <div className="form-check-inline">
+                <label className="form-check-label" htmlFor="radio1">
                   <input
                     type="radio"
-                    class="form-check-input"
+                    className="form-check-input"
                     id="radio1"
                     name="optradio"
                     value="option1"
@@ -99,11 +99,11 @@ class Header extends Component {
                   Nam
                 </label>
               </div>
-              <div class="form-check-inline">
-                <label class="form-check-label" for="radio2">
+              <div className="form-check-inline">
+                <label className="form-check-label" htmlFor="radio2">
                   <input
                     type="radio"
-                    class="form-check-input"
+                    className="form-check-input"
                     id="radio2"
                     name="optradio"
                     value="option2"
@@ -208,7 +208,7 @@ class Header extends Component {
           </div>
         </div>
         <div className="form-group">
-          <label className="checkbox-inline" for="accept">
+          <label className="checkbox-inline" htmlFor="accept">
             <input
               type="checkbox"
               required="required"

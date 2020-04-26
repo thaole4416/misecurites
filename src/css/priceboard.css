@@ -1,179 +1,202 @@
 /* Menu */
 .menu {
-    width: 100%;
-    margin-bottom: 4px;
-    height: 30px;
+  width: 100%;
+  margin-bottom: 4px;
+  height: 30px;
 }
 .btn-menu {
-    margin-left: 2px;
-    padding-top: 2px;
-    color: white;
-    height: 100%;
-    background-color: #111111;
-    border: 1px solid #111111;
+  margin-left: 2px;
+  padding-top: 2px;
+  color: white;
+  height: 100%;
+  background-color: #111111;
+  border: 1px solid #111111;
 }
 
 .button-menu {
-    margin-left: 2px;
-    /* padding-left: 10px; */
-    float: left;
-    height: 30px;
-    /* border-radius: 5px; */
+  margin-left: 2px;
+  /* padding-left: 10px; */
+  float: left;
+  height: 30px;
+  /* border-radius: 5px; */
 }
 
-.menu .active{
-    background-color: #f7941d!important;
+.menu .active {
+  background-color: #f7941d !important;
 }
 
 .menu .input {
-    /* margin-top: 10px; */
-    float: left;
-    margin-top: 0px;
-    height: 95%;
-    width: 180px;
-    border: 1px solid white;
-    /* border-radius: 5% 0 0 5%; */
-
+  /* margin-top: 10px; */
+  float: left;
+  margin-top: 0px;
+  height: 95%;
+  width: 180px;
+  border: 1px solid white;
+  /* border-radius: 5% 0 0 5%; */
 }
 .menu .order {
-    width: 95px;
-    float: right;
+  width: 95px;
+  float: right;
 }
 
-.menu button{
-    cursor: pointer;
+.menu button {
+  cursor: pointer;
 }
 
-.button-menu:hover, .btn-menu:hover {
-    background-color: rgba(247,148,29,.3);
+.button-menu:hover,
+.btn-menu:hover {
+  background-color: rgba(247, 148, 29, 0.3);
 }
 
 .add {
-    color: white;
-    padding-top: 2px;
-    margin-bottom: 2px;
-    background-color: #181818;
-    height: 100%;
-    width: 40px;
-    border: 1px solid #222222;
+  color: white;
+  padding-top: 2px;
+  margin-bottom: 2px;
+  background-color: #181818;
+  height: 100%;
+  width: 40px;
+  border: 1px solid #222222;
 }
 
 /* Table */
 #stocks_list table {
-    height: 100%;
-    font-size: 13px;
-    margin-bottom: -2px;
-    background-color: #181818;
-    color: white;
-    text-align: right;
-    vertical-align: middle;
-    border-collapse: collapse;
+  height: 100%;
+  font-size: 13px;
+  margin-bottom: -2px;
+  background-color: #181818;
+  color: white;
+  text-align: right;
+  vertical-align: middle;
+  border-collapse: collapse;
 }
 
 #stocks_list table thead {
-    font-size: 12px;
-    border: 1px solid #282828;
-    border-bottom: 2px solid #faa51d;
+  font-size: 12px;
+  border: 1px solid #282828;
+  border-bottom: 2px solid #faa51d;
 }
 
 #stocks_list table tbody:nth-child(even) {
-    background-color: #111111;
+  background-color: #111111;
 }
 
 #stocks_list table tbody tr:hover {
-    background-color: #282828;
-    border: none;
+  background-color: #282828;
+  border: none;
 }
 
 td,
 th {
-    text-overflow: ellipsis;
-    text-align: center;
-    padding: 3px 0 3px 0;
-    height: 10px;
+  text-overflow: ellipsis;
+  text-align: center;
+  padding: 3px 0 3px 0;
+  height: 10px;
 }
 
 /* TABLE-ALL END */
 
 /* TABLE-TOP */
 #stocks_list .table-top {
-    width: 100vw;
+  width: 100vw;
 }
 
 .table-top thead th {
-    font-weight: 400;
-    font-size: 13px;
-    border: 1px solid #282828;
+  font-weight: 400;
+  font-size: 13px;
+  border: 1px solid #282828;
 }
 
 .table-top thead {
-    text-overflow: ellipsis;
-    width: calc(100vw);
-    font-weight: normal;
-    border-bottom: 2px solid #faa51d;
+  text-overflow: ellipsis;
+  width: calc(100vw);
+  font-weight: normal;
+  border-bottom: 2px solid #faa51d;
 }
 
 /* TABLE-TOP END*/
 .div-table-row {
-    width: 100vw;
-    height: calc(100vh - 332px);
-    /* overflow: scroll; */
-    margin-top: 2px;
-    /* margin-left: 1px; */
-
+  width: 100vw;
+  height: calc(100vh - 332px);
+  /* overflow: scroll; */
+  margin-top: 2px;
+  /* margin-left: 1px; */
 }
 
 /* TABLE-ROW */
 #stocks_list .table-row {
-
-    margin-top: 2px;
-    font-size: 12px;
-    width: 100vw;
-    height: auto;
-    /* background-color: red; */
-    /* height: 100%; */
+  margin-top: 2px;
+  font-size: 12px;
+  width: 100vw;
+  height: auto;
+  /* background-color: red; */
+  /* height: 100%; */
 }
 
 #stocks_list .table-row tbody {
-    text-overflow: ellipsis;
-    width: 100vw;
+  text-overflow: ellipsis;
+  width: 100vw;
 }
 
 .tr {
-    width: 100vw;
-    /* background-color: yellow; */
+  width: 100vw;
+  /* background-color: yellow; */
 }
 
 .td {
-    height: 25px;
-    text-align: right;
-    padding-right: 2px;
-    /* font-family: Arial, Helvetica, sans-serif; */
+  height: 25px;
+  text-align: right;
+  padding-right: 2px;
+  /* font-family: Arial, Helvetica, sans-serif; */
 }
 
 .table-row td {
-    cursor: auto;
-
-    /* background-color: red; */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-left: 1px solid #282828;
+  cursor: auto;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 1px solid #282828;
 }
 
+.table-row  i {
+    color: white;
+    position: absolute;
+    top: 6px;
+    left: 3px;
+    display: none;
+}
+
+.up-change{
+    background-color: #06f506;
+    color: white;
+}
+
+.down-change{
+    background-color: #ea0713;
+    color: white;
+}
+
+.up-change i, .down-change i{
+ display: block;
+}
+/* .up-change span {
+    animation: color-change 2s forwards ;
+} */
+
+
+
 .highlight {
-    background-color: #181818;
+  background-color: #181818;
 }
 
 .highlight:nth-child(even) {
-    background-color: #111111;
+  background-color: #111111;
 }
 
 span {
-    padding-bottom: 5px;
+  padding-bottom: 5px;
 }
 
 .td-test {
-    display: block;
-
+  display: block;
 }

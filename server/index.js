@@ -2,18 +2,18 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
-const authMiddleware = require("./middlewares/auth.middleware");
-const emitter = require('./emitter')
-// const sanGiaoDichRoute = require("./routes/sanGiaoDich.route");
-// const taiKhoanRoute = require("./routes/taiKhoan.route");
 const routes = require("./routes");
+
+
 
 require("dotenv").config({ path: "./.env" });
 
 const app = express();
-
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 const port = process.env.SERVER_PORT || 5000;
 app.use(cors());
+app.options('*', cors());
 app.use(cookieParser("huhon"));
 app.use(express.json());
 
@@ -30,7 +30,9 @@ connection.once("open", () =>
   console.log("MongoDB database connection etablished successfully")
 );
 
-// app.use("/api/sanGiaoDich/", authMiddleware.requireAuth,sanGiaoDichRoute);
-// app.use("/api/taiKhoan",taiKhoanRoute);
 app.use("/api", routes);
-app.listen(port, () => console.log(`Server is running on port ${port}`));
+
+io.on("connection", socket => {
+  socket.on('sayHello',() => console.log("Hello!!"))
+});
+server.listen(port, () => console.log(`Server is running on port ${port}`));

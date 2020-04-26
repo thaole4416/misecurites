@@ -1,27 +1,27 @@
-import React, { Component } from 'react'
-import Header from './components/header.page'
+import React, { Component } from "react";
+import Header from "./components/header.page";
 import Footer from "./components/footer.page";
 import PriceBoard from "./components/priceboard/priceboard.page";
-
+import { Provider } from "react-redux";
+import dataStore from "./redux";
 class App extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
-    this.state = {
-         
-    }
+    this.state = {};
   }
 
   render() {
     return (
-      <div>
-        <Header/>
-        <PriceBoard/>
-        <Footer/>
-      </div>
-    )
+      <Provider store={dataStore}>
+        <div>
+          <Header />
+          <PriceBoard />
+          <Footer />
+        </div>
+      </Provider>
+    );
   }
 }
 
-export default App
-
+export default App;
