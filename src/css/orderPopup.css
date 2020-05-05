@@ -1,0 +1,13 @@
+.orderPopup{
+    margin-top: 25px;
+}
+.toggle.btn-success {
+    width: 100%!important;
+}
+.toggle.btn-danger {
+    width: 100%!important;
+}
+
+.skylight-close-button{
+    display: none;
+}

@@ -14,5 +14,6 @@ const base_uri = "/giaoDichKhop";
  }
  */
 route.get(base_uri+"/", giaoDichKhopController.getAll);
+route.delete(base_uri+"/", giaoDichKhopController.clearAll);
 
 module.exports = route;

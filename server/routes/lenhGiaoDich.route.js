@@ -15,5 +15,6 @@ const base_uri = "/lenhGiaoDich";
  */
 route.get(base_uri+"/", lenhGiaoDichController.getAll);
 route.post(base_uri+"/",authMiddleware.requireAuth, lenhGiaoDichController.create);
+route.delete(base_uri+"/", lenhGiaoDichController.clearAll);
 
 module.exports = route;

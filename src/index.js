@@ -6,6 +6,7 @@ import './css/app.css'
 import './css/header.css'
 import './css/footer.css'
 import './css/priceboard.css'
+import './css/orderPopup.css'
 
 ReactDOM.render(
   <React.StrictMode>

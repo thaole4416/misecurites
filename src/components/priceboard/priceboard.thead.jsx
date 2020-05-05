@@ -38,18 +38,18 @@ class Thead extends React.Component {
             </th>
             {/* hidden */}
 
-            <th className={`rs-hidden-3`} colSpan='6' style={{ width: '22.5%' }}>Dư mua</th>
+            <th className={``} colSpan='6' style={{ width: '22.5%' }}>Dư mua</th>
             <th colSpan='3' style={{ width: '10.5%' }}>Khớp lệnh</th>
-            <th className={`rs-hidden-3`} colSpan='6' style={{ width: '22.5%' }}>Dư bán</th>
+            <th className={``} colSpan='6' style={{ width: '22.5%' }}>Dư bán</th>
 
           </tr>
           <tr>
-            <th className={`th rs-hidden-2`} style={{ width: '3%' }}>Giá 3</th>
-            <th className={`th rs-hidden-2`} style={{ width: '4.5%' }}>KL 3</th>
-            <th className={`th rs-hidden-3`} style={{ width: '3%' }}>Giá 2</th>
-            <th className={`th rs-hidden-3`} style={{ width: '4.5%' }}>KL2</th>
-            <th className={`th rs-hidden-3`} style={{ width: '3%' }}>Giá 1</th>
-            <th className={`th rs-hidden-3`} style={{ width: '4.5%' }}>KL 1</th>
+            <th className={`th `} style={{ width: '3%' }}>Giá 3</th>
+            <th className={`th `} style={{ width: '4.5%' }}>KL 3</th>
+            <th className={`th `} style={{ width: '3%' }}>Giá 2</th>
+            <th className={`th `} style={{ width: '4.5%' }}>KL2</th>
+            <th className={`th `} style={{ width: '3%' }}>Giá 1</th>
+            <th className={`th `} style={{ width: '4.5%' }}>KL 1</th>
 
             <th className={`th`} style={{ width: '3%' }}>Giá</th>
             <th className={`th`} style={{ width: '4%' }}>KL</th>
@@ -57,12 +57,12 @@ class Thead extends React.Component {
               <p style={{ width: '60%', float: 'left', paddingTop: '10px' }}>+/-</p>
             </th>
 
-            <th className={`th rs-hidden-2`} style={{ width: '3%' }}>Giá 3</th>
-            <th className={`th rs-hidden-2`} style={{ width: '4.5%' }}>KL 3</th>
-            <th className={`th rs-hidden-3`} style={{ width: '3%' }}>Giá 2</th>
-            <th className={`th rs-hidden-3`} style={{ width: '4.5%' }}>KL2</th>
-            <th className={`th rs-hidden-3`} style={{ width: '3%' }}>Giá 1</th>
-            <th className={`th rs-hidden-3`} style={{ width: '4.5%' }}>KL 1</th>
+            <th className={`th `} style={{ width: '3%' }}>Giá 3</th>
+            <th className={`th `} style={{ width: '4.5%' }}>KL 3</th>
+            <th className={`th `} style={{ width: '3%' }}>Giá 2</th>
+            <th className={`th `} style={{ width: '4.5%' }}>KL2</th>
+            <th className={`th `} style={{ width: '3%' }}>Giá 1</th>
+            <th className={`th `} style={{ width: '4.5%' }}>KL 1</th>
 
 
           </tr>

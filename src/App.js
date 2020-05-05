@@ -4,6 +4,7 @@ import Footer from "./components/footer.page";
 import PriceBoard from "./components/priceboard/priceboard.page";
 import { Provider } from "react-redux";
 import dataStore from "./redux";
+
 class App extends Component {
   constructor(props) {
     super(props);

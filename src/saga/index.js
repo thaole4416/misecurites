@@ -1,5 +1,7 @@
 import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
+import { changeStocks, login } from "../redux"
 import { getExc } from "./stocksSaga";
+import { loginSaga } from "./userSaga";
 function* fetchUser(action) {
 //    try {
 //       const user = yield call(Api.fetchUser, action.payload.userId);
@@ -11,7 +13,8 @@ function* fetchUser(action) {
 }
 
 function* rootSaga() {
-  yield takeEvery("CHANGE_STOCKS", getExc);
+  // yield takeEvery(changeStocks, getExc);
+  yield takeEvery("LOGIN", loginSaga);
 }
 
 export default rootSaga;

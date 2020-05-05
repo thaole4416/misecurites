@@ -7,7 +7,12 @@ let getAll = (req, res) => {
     .then((giaoDichKhop) => res.json(giaoDichKhop))
     .catch((err) => res.status(400).json("Error: " + err));
 };
-
+let clearAll = (req, res) => {
+  GiaoDichKhop.deleteMany()
+  .then((giaoDichKhop) => res.json(giaoDichKhop))
+  .catch((err) => res.status(400).json("Error: " + err));
+};
 module.exports = {
   getAll: getAll,
+  clearAll: clearAll
 };

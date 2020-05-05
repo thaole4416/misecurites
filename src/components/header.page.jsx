@@ -1,5 +1,9 @@
 import React, { Component } from "react";
+import LoginPopup from "./popup/login.popup";
+import RegisterPopup from "./popup/register.popup";
 import SkyLight from "react-skylight";
+import { login } from "../redux";
+import { connect } from "react-redux";
 
 class Header extends Component {
   constructor(props) {
@@ -8,223 +12,29 @@ class Header extends Component {
     this.state = {};
   }
 
+  register = () => {
+    this.loginPopup.hide();
+    this.registerPopup.show();
+  };
+
+  submitLogin = (loginPostData, e) => {
+    e.preventDefault();
+    this.props.login(loginPostData)
+  };
+
   render() {
     let loginPopupStyle = {
-      backgroundColor: "black",
+      backgroundColor: "rgb(33,32,39)",
       width: "30%",
       marginLeft: "-35%",
       left: "70%",
     };
     let registerPopupStyle = {
-      backgroundColor: "black",
+      backgroundColor: "rgb(33,32,39)",
       width: "70%",
       marginLeft: "-15%",
       left: "30%",
     };
-    let loginPopup = (
-      <div className="login-form">
-        <form action="/examples/actions/confirmation.php" method="post">
-          <div className="form-group">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Tên đăng nhập"
-              required="required"
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="password"
-              className="form-control"
-              placeholder="Mật khẩu"
-              required="required"
-            />
-          </div>
-          <div className="form-group">
-            <button type="submit" className="btn btn-block">
-              Đăng nhập
-            </button>
-          </div>
-          <div className="clearfix"></div>
-        </form>
-        <p className="text-center">
-          <a
-            href="javascipt:void(0)"
-            onClick={() => {
-              this.loginPopup.hide();
-              this.registerPopup.show();
-            }}
-          >
-            Đăng ký tài khoản
-          </a>
-        </p>
-      </div>
-    );
-    let registerPopup = (
-      <form action="/examples/actions/confirmation.php" method="post">
-        <div className="form-group">
-          <div className="row">
-            <div className="col-4">
-              <input
-                type="text"
-                className="form-control"
-                name="tenTaiKhoan"
-                placeholder="Họ và tên"
-                required="required"
-              />
-            </div>
-            <div className="col-4">
-              <input
-                type="text"
-                className="form-control"
-                name="ngaySinh"
-                placeholder="Ngày sinh"
-                required="required"
-              />
-            </div>
-            <div className="col-4">
-              <label className="form-check-label mr-5" htmlFor="radio1">
-                Giới tính
-              </label>
-              <div className="form-check-inline">
-                <label className="form-check-label" htmlFor="radio1">
-                  <input
-                    type="radio"
-                    className="form-check-input"
-                    id="radio1"
-                    name="optradio"
-                    value="option1"
-                    checked
-                  />
-                  Nam
-                </label>
-              </div>
-              <div className="form-check-inline">
-                <label className="form-check-label" htmlFor="radio2">
-                  <input
-                    type="radio"
-                    className="form-check-input"
-                    id="radio2"
-                    name="optradio"
-                    value="option2"
-                  />
-                  Nữ
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="form-group">
-          <div className="row">
-            <div className="col-4">
-              <input
-                type="text"
-                className="form-control"
-                name="CMND"
-                placeholder="CMND"
-                required="required"
-              />
-            </div>
-            <div className="col-4">
-              <input
-                type="text"
-                className="form-control"
-                name="ngayCap"
-                placeholder="Ngày cấp"
-                required="required"
-              />
-            </div>
-            <div className="col-4">
-              <input
-                type="text"
-                className="form-control"
-                name="noiCap"
-                placeholder="Nơi cấp"
-                required="required"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="form-group">
-          <input
-            type="text"
-            className="form-control"
-            name="diaChi"
-            placeholder="Địa chỉ"
-            required="required"
-          />
-        </div>
-        <div className="form-group">
-          <div className="row">
-            <div className="col-6">
-              <input
-                type="text"
-                className="form-control"
-                name="soDienThoai"
-                placeholder="Số điện thoại"
-                required="required"
-              />
-            </div>
-            <div className="col-6">
-              <input
-                type="text"
-                className="form-control"
-                name="email"
-                placeholder="Email"
-                required="required"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="form-group">
-          <div className="row">
-            <div className="col-4">
-              <input
-                type="text"
-                className="form-control"
-                name="tenDangNhap"
-                placeholder="Tên đăng nhập"
-                required="required"
-              />
-            </div>
-            <div className="col-4">
-              <input
-                type="password"
-                className="form-control"
-                name="matKhau"
-                placeholder="Mật khẩu"
-                required="required"
-              />
-            </div>
-            <div className="col-4">
-              <input
-                type="password"
-                className="form-control"
-                name="matKhau2"
-                placeholder="Nhập lại mật khẩu"
-                required="required"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="form-group">
-          <label className="checkbox-inline" htmlFor="accept">
-            <input
-              type="checkbox"
-              required="required"
-              name="accept"
-              id="accept"
-            />{" "}
-            Tôi đồng ý các điều khoản dịch vụ.
-          </label>
-        </div>
-        <div className="form-group">
-          <button type="submit" className="btn btn-primary btn-lg">
-            Đăng ký
-          </button>
-        </div>
-      </form>
-    );
     return (
       <div className="header">
         <div className="login div">
@@ -242,7 +52,7 @@ class Header extends Component {
           ref={(ref) => (this.loginPopup = ref)}
           title="Đăng nhập hệ thống"
         >
-          {loginPopup}
+          <LoginPopup register={this.register} submit={this.submitLogin} />
         </SkyLight>
         <SkyLight
           dialogStyles={registerPopupStyle}
@@ -250,11 +60,20 @@ class Header extends Component {
           ref={(ref) => (this.registerPopup = ref)}
           title="Đăng ký tài khoản"
         >
-          {registerPopup}
+          <RegisterPopup />
         </SkyLight>
       </div>
     );
   }
 }
 
-export default Header;
+const mapStateToProps = ({user}) => ({
+  user : user
+});
+const mapDispatchToProps = (dispatch) => ({
+  login: (postData) => {
+    dispatch(login(postData));
+  },
+});
+
+export default connect(mapStateToProps,mapDispatchToProps)(Header);

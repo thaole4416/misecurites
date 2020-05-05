@@ -28,7 +28,11 @@ let getAll = (req, res) => {
 let searchByExchangeId = async (req, res) => {
   let maSan = req.params.maSan;
   let coPhieus = await CoPhieu.find({ maSan: maSan });
-  res.json({ stocks: coPhieus });
+  let result = [];
+  for (let coPhieu of coPhieus) {
+    result.push(coPhieu._id);
+  }
+  res.json({ stocks: result });
 };
 
 let searchById = async (req, res) => {
@@ -41,5 +45,5 @@ module.exports = {
   create: create,
   getAll: getAll,
   searchById: searchById,
-  searchByExchangeId:searchByExchangeId
+  searchByExchangeId: searchByExchangeId,
 };

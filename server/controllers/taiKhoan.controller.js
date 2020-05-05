@@ -22,11 +22,11 @@ let login = async (req, res) => {
   let matKhau = req.body.matKhau;
   let taiKhoan = await TaiKhoan.findOne({
     tenDangNhap: tenDangNhap,
-  }).select('matKhau');
+  })
   let checkPassword = await bcrypt.compare(matKhau, taiKhoan.matKhau);
   if (checkPassword) {
     res.cookie("userId", taiKhoan._id, { signed: true });
-    res.json({ message: "Đăng nhập thành công" });
+    res.json({ message: "OK" , id:taiKhoan._id , username: tenDangNhap  });
   } else {
     res.json({ message: "Thông tin tài khoản hoặc mật khẩu không đúng" });
   }

@@ -8,61 +8,59 @@ class TRow extends Component {
 
     this.state = {
       stock_data: {
-        SB: "",
-        CL: "",
-        FL: "",
-        RE: "",
-        B3: "",
-        B2: "",
-        B1: "",
-        V3: "",
-        V2: "",
-        V1: "",
-        S3: "",
-        S2: "",
-        S1: "",
-        U3: "",
-        U2: "",
-        U1: "",
-        CP: "",
-        CV: "",
-        PC: "",
-        TT: "",
-        TV: "",
+        symbol: "",
+        ceiling: "",
+        floor: "",
+        reference: "",
+        buy_1: "",
+        buy_2: "",
+        buy_3: "",
+        bVol_1: "",
+        bVol_2: "",
+        bVol_3: "",
+        match: "",
+        mVol: "",
+        sell_1: "",
+        sell_2: "",
+        sell_3: "",
+        sVol_1: "",
+        sVol_2: "",
+        sVol_3: "",
+        totalVal: "",
+      totalVol: ""
       },
       previous_stock_data: {
-        SB: "",
-        CL: "",
-        FL: "",
-        RE: "",
-        B3: "",
-        B2: "",
-        B1: "",
-        V3: "",
-        V2: "",
-        V1: "",
-        S3: "",
-        S2: "",
-        S1: "",
-        U3: "",
-        U2: "",
-        U1: "",
-        CP: "",
-        CV: "",
-        PC: "",
-        TT: "",
-        TV: "",
+        symbol: "",
+        ceiling: "",
+        floor: "",
+        reference: "",
+        buy_1: "",
+        buy_2: "",
+        buy_3: "",
+        bVol_1: "",
+        bVol_2: "",
+        bVol_3: "",
+        match: "",
+        mVol: "",
+        sell_1: "",
+        sell_2: "",
+        sell_3: "",
+        sVol_1: "",
+        sVol_2: "",
+        sVol_3: "",
+        totalVal: "",
+      totalVol: ""
       },
       B2_highlight: "",
     };
   }
 
   checkColor(a, b) {
-    const { CL, FL } = this.props.stock_data;
-    if (b < a && b !== 0 && b > FL) {
+    const { ceiling, floor } = this.props.stock_data;
+    if (b < a && b !== 0 && b > floor) {
       return "red";
     }
-    if (b > a && b < CL) {
+    if (b > a && b < ceiling) {
       return "green";
     }
     if (a === b) {
@@ -71,33 +69,40 @@ class TRow extends Component {
     if (b === 0 || b === null) {
       return "yellow";
     }
-    if (b === CL || b > CL) {
+    if (b === ceiling || b > ceiling) {
       return "purple";
     }
-    if (b === FL || b < FL) {
+    if (b === floor || b < floor) {
       return "blue";
     }
     return "";
   }
-  checkDate(date) {
-    if (date) {
-      let result = date.substr(0, 6) + date.substr(8, 2);
-      return result;
-    } else {
-      return "";
-    }
-  }
 
   checkKL(value) {
-    return value;
+    let index = 0;
+    let result = "";
+    if(value){
+      value =  (value / 10).toFixed(1).toString().split('.');
+    for(let i = value[0].length - 1; i >=0 ; i--){
+      if(index === 3){
+        result = value[0][i] + "," + result;
+        index = 0;
+      }
+      else {
+        result = value[0][i] + result;
+        index++;
+      }
+    }
+    return value[1] * 1 ? result + "." + value[1] : result; 
+    }
+    else return result;
   }
-  checkEmpty(value) {
+  checkEmpty(value, isTotalVal = false) {
     if (value && value !== 0) {
-      // if(b==='CV')
       if (Number.isInteger(value)) {
-        return (value / 1000).toFixed(2);
+        return isTotalVal ? (value / 1000000).toFixed(2) : (value / 1000).toFixed(2);
       } else {
-        return (value / 1000).toFixed(2);
+        return isTotalVal ? (value / 1000000).toFixed(2): (value / 1000).toFixed(2);
       }
     } else {
       return "";
@@ -113,6 +118,7 @@ class TRow extends Component {
         };
       }
     }
+    return null;
   }
 
   componentDidMount() {
@@ -124,65 +130,50 @@ class TRow extends Component {
   }
 
   render() {
-    let colorRow = this.props.index % 2 === 0 ? "#111" : "";
     let color = this.props.index % 2 === 0 ? "color1" : "color2";
     const {
-      SB,
-      CL,
-      FL,
-      RE,
-      B3,
-      B2,
-      B1,
-      V3,
-      V2,
-      V1,
-      S3,
-      S2,
-      S1,
-      U3,
-      U2,
-      U1,
-      CP,
-      CV,
-      PC,
-      TT,
-      TV,
+      symbol,
+      ceiling,
+      floor,
+      reference,
+      buy_1,
+      buy_2,
+      buy_3,
+      bVol_1,
+      bVol_2,
+      bVol_3,
+      sell_1,
+      sell_2,
+      sell_3,
+      sVol_1,
+      sVol_2,
+      sVol_3,
+      match,
+      mVol,
+      totalVal,
+      totalVol
     } = this.state.stock_data;
     const {
-      P_SB,
-      P_CL,
-      P_FL,
-      P_RE,
-      P_B3,
-      B2: P_B2,
-      P_B1,
-      P_V3,
-      P_V2,
-      P_V1,
-      P_S3,
-      P_S2,
-      P_S1,
-      P_U3,
-      P_U2,
-      P_U1,
-      P_CP,
-      P_CV,
-      P_PC,
-      P_TT,
-      P_TV,
+      P_reference,
+      buy_1: P_buy_1,
+      buy_2: P_buy_2,
+      buy_3: P_buy_3,
+      sell_1: P_sell_1,
+      sell_2: P_sell_2,
+      sell_3: P_sell_3,
+      match: P_match,
+      mVol: P_mVol,
+      // P_TT,
+      // P_TV,
     } = this.state.previous_stock_data;
-
+    // let PC = CP - reference;
     return (
-      SB && (
-        <tr
-          className="stock-row highlight"
-          style={{ backgroundColor: colorRow }}
-        >
+      symbol && (
+        <tr className="stock-row highlight">
           <td
             onClick={this.props.click}
-            // onClick={() => this.handleClick(SB)}
-            className={`${this.checkColor(RE, CP)} rs-colum`}
+            // onClick={() => this.handleClick(symbol)}
+            className={`${this.checkColor(reference, match)} rs-colum`}
             style={{
               width: "5%",
               fontWeight: "600",
@@ -192,45 +183,41 @@ class TRow extends Component {
               cursor: "pointer",
             }}
           >
-            {SB}
+            <span>{symbol}</span>
           </td>
 
           {/* hidden */}
           <td className={`purple td ${color}`} style={{ width: "3%" }}>
-            {this.checkEmpty(CL)}
+            <span>{this.checkEmpty(ceiling)}</span>
           </td>
           <td className={`blue td ${color}`} style={{ width: "3%" }}>
-            {this.checkEmpty(FL)}
+            <span>{this.checkEmpty(floor)}</span>
           </td>
           <td className={`yellow td ${color}`} style={{ width: "3%" }}>
-            {this.checkEmpty(RE)}
+            <span>{this.checkEmpty(reference)}</span>
           </td>
           <td className={`white td`} style={{ width: "5%" }}>
-            {TT}
+            <span>{this.checkKL(totalVol)}</span>
           </td>
           <td className={`white td`} style={{ width: "5%" }}>
-            {TV}
+            <span>{this.checkEmpty(totalVal, true)}</span>
           </td>
-
-          <td
-            className={`${this.checkColor(RE, B3)} td rs-hidden-2  change${B3}`}
+          <HighlighRow
+            className={`${this.checkColor(reference, buy_1)}  td`}
             style={{
               width: "3%",
-              animation: `${this.checkColor(RE, B3)}-change 2s forwards`,
             }}
-          >
-            <i className="fa fa-arrow-up"></i>
-            <span>{this.checkEmpty(B3)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, B3)} td rs-hidden-2 `}
+            span={this.checkEmpty(buy_1)}
+            isHighlight={buy_1 - P_buy_1}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, buy_1)}  td`}
             style={{ width: "4.5%" }}
-          >
-            <i className="fa fa-arrow-up"></i>
-            <span>{this.checkEmpty(V3)}</span>
-          </td>
+            span={this.checkKL(bVol_1)}
+            isHighlight={buy_1 - P_buy_1}
+          />
           {/* <td
-            className={`${this.checkColor(RE, B2)} rs-hidden-3 td `}
+            className={`${this.checkColor(RE, B2)}  td `}
             style={{
               width: "3%",
             }}
@@ -238,87 +225,91 @@ class TRow extends Component {
             <span>{this.checkEmpty(B2)}</span>
           </td> */}
           <HighlighRow
-            className={`${this.checkColor(RE, B2)} rs-hidden-3 td`}
+            className={`${this.checkColor(reference, buy_2)}  td`}
             style={{
               width: "3%",
             }}
-            span={this.checkEmpty(B2)}
-            isHighlight ={B2 - P_B2}
+            span={this.checkEmpty(buy_2)}
+            isHighlight={buy_2 - P_buy_2}
           />
-          <td
-            className={`${this.checkColor(RE, B2)} rs-hidden-3 td `}
+          <HighlighRow
+            className={`${this.checkColor(reference, buy_2)}  td`}
             style={{ width: "4.5%" }}
-          >
-            <span>{this.checkEmpty(V2)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, B1)} rs-hidden-3 td `}
-            style={{ width: "3%" }}
-          >
-            <span>{this.checkEmpty(B1)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, B1)} rs-hidden-3 td `}
+            span={this.checkKL(bVol_2)}
+            isHighlight={buy_2 - P_buy_2}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, buy_3)}  td`}
+            style={{
+              width: "3%",
+            }}
+            span={this.checkEmpty(buy_3)}
+            isHighlight={buy_3 - P_buy_3}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, buy_3)}  td`}
             style={{ width: "4.5%" }}
-          >
-            <span>{this.checkEmpty(V1)}</span>
-          </td>
-
-          <td
-            className={`${this.checkColor(RE, CP)} td ${color} `}
-            style={{ width: "3%" }}
-          >
-            <span>{this.checkEmpty(CP)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, CP)} td ${color} `}
-            style={{ width: "4%" }}
-          >
-            <span> {this.checkKL(CV)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, CP)} td ${color} `}
+            span={this.checkKL(bVol_3)}
+            isHighlight={buy_3 - P_buy_3}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, match)}  td ${color}`}
+            style={{
+              width: "3%",
+            }}
+            span={this.checkEmpty(match)}
+            isHighlight={match - P_match}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, match)}  td ${color}`}
+            style={{
+              width: "4%",
+            }}
+            span={this.checkKL(mVol)}
+            isHighlight={mVol - P_mVol}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, match)}  td ${color}`}
             style={{ width: "3.5%" }}
-          >
-            <span>{PC}</span>
-          </td>
-
-          <td
-            className={`${this.checkColor(RE, S1)} rs-hidden-3 td `}
+            span={this.checkEmpty(match - reference)}
+            isHighlight={match - reference - (P_match - P_reference)}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, sell_1)}  td`}
             style={{ width: "3%" }}
-          >
-            <span> {this.checkEmpty(S1)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, S1)} rs-hidden-3 td `}
+            span={this.checkEmpty(sell_1)}
+            isHighlight={sell_1 - P_sell_1}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, sell_1)}  td`}
             style={{ width: "4.5%" }}
-          >
-            <span>{this.checkEmpty(U1)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, S2)} rs-hidden-3 td `}
+            span={this.checkKL(sVol_1)}
+            isHighlight={sell_1 - P_sell_1}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, sell_2)}  td`}
             style={{ width: "3%" }}
-          >
-            <span> {this.checkEmpty(S2)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, S2)} rs-hidden-3 td `}
+            span={this.checkEmpty(sell_2)}
+            isHighlight={sell_2 - P_sell_2}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, sell_2)}  td`}
             style={{ width: "4.5%" }}
-          >
-            <span>{this.checkEmpty(U2)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, S3)} td rs-hidden-2 `}
+            span={this.checkKL(sVol_2)}
+            isHighlight={sell_2 - P_sell_2}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, sell_3)}  td`}
             style={{ width: "3%" }}
-          >
-            <span>{this.checkEmpty(S3)}</span>
-          </td>
-          <td
-            className={`${this.checkColor(RE, S3)} td rs-hidden-2 `}
+            span={this.checkEmpty(sell_3)}
+            isHighlight={sell_3 - P_sell_3}
+          />
+          <HighlighRow
+            className={`${this.checkColor(reference, sell_3)}  td`}
             style={{ width: "4.5%" }}
-          >
-            <span>{this.checkEmpty(U3)}</span>
-          </td>
+            span={this.checkKL(sVol_3)}
+            isHighlight={sell_3 - P_sell_3}
+          />
         </tr>
       )
     );

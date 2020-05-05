@@ -13,6 +13,11 @@ const giaoDichKhopSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: true,
       ref: 'LenhGiaoDich'
+    },    
+    maCoPhieu: {
+      type: String,
+      required: true,
+      ref: 'CoPhieu'
     },
     khoiLuong: { type: Number, required: true },
     gia: { type: Number, required: true },
