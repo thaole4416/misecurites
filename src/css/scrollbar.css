@@ -1,0 +1,46 @@
+.custom-scrollbar:hover > .track-horizontal, .custom-scrollbar:hover > .track-vertical {
+    opacity: 1 !important;
+}
+.custom-scrollbar:hover > .track-horizontal > .thumb-horizontal, .custom-scrollbar:hover > .track-vertical > .thumb-horizontal, .custom-scrollbar:hover > .track-horizontal > .thumb-vertical, .custom-scrollbar:hover > .track-vertical > .thumb-vertical {
+    opacity: 1;
+}
+.custom-scrollbar .track-horizontal {
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+.custom-scrollbar .track-vertical {
+    right: 0;
+    bottom: 0;
+    top: 0;
+}
+.custom-scrollbar .thumb-horizontal {
+    cursor: pointer;
+    background-clip: padding-box;
+    min-width: 28px;
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.10), inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+}
+.custom-scrollbar .thumb-horizontal:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.50);
+}
+.custom-scrollbar .thumb-horizontal:active {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.6);
+}
+.custom-scrollbar .thumb-vertical {
+    cursor: pointer;
+    background-clip: padding-box;
+    min-height: 28px;
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.10), inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+}
+.custom-scrollbar .thumb-vertical:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.50);
+}
+.custom-scrollbar .thumb-vertical:active {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.6);
+}

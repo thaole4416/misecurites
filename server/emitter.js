@@ -1,16 +1,10 @@
-var EventEmitter2 = require("eventemitter2").EventEmitter2;
-var emitter = new EventEmitter2({
-  wildcard: true,
-  delimiter: "::",
-  newListener: false,
-  removeListener: true,
-  maxListeners: 20,
-  verboseMemoryLeak: false,
-  ignoreErrors: false,
-});
+var EventEmitter = require("events");
+var emitter = new EventEmitter();
 
-const Util = require("./utils");
+const TimeHelper = require("./helpers/time");
+const RandomHelper = require("./helpers/random");
 const CoPhieu = require("./models/coPhieu.model");
+const TaiKhoan = require("./models/taiKhoan.model");
 const LenhGiaoDich = require("./models/lenhGiaoDich.model");
 const GiaoDichKhop = require("./models/giaoDichKhop.model");
 
@@ -20,8 +14,8 @@ const orderType = Object.freeze({
 });
 
 emitter.on("initData", async () => {
-  await _initOrder(orderType.buy, 20);
-  await _initOrder(orderType.sell, 20);
+  await _initOrder(orderType.buy, 200);
+  await _initOrder(orderType.sell, 200);
   emitter.emit("getExchangeData");
 });
 
@@ -30,7 +24,7 @@ emitter.on("MatchOrder", async (params) => {
   const lenhBans = await LenhGiaoDich.find({
     maCoPhieu: stockId,
     gia: gia,
-    createdDay: Util.getToday(),
+    createdDay: TimeHelper.getToday(),
     loaiLenh: orderType.sell,
     khoiLuong: { $ne: 0 },
     trangThai: { $ne: "đã khớp" },
@@ -38,7 +32,7 @@ emitter.on("MatchOrder", async (params) => {
   const lenhMuas = await LenhGiaoDich.find({
     maCoPhieu: stockId,
     gia: gia,
-    createdDay: Util.getToday(),
+    createdDay: TimeHelper.getToday(),
     loaiLenh: orderType.buy,
     khoiLuong: { $ne: 0 },
     trangThai: { $ne: "đã khớp" },
@@ -85,7 +79,6 @@ emitter.on("MatchOrder", async (params) => {
     if (!lenhBans[0]) return;
     let lenhBan = lenhBans[0];
     for (let lenhMua of lenhMuas) {
-      // if (lenhMua.gia === lenhBan.gia /*&& lenhMua._id != maLenhBan*/) {
       if (lenhBan.khoiLuong > 0) {
         if (lenhBan.khoiLuong >= lenhMua.khoiLuong) {
           await _saveGiaoDichKhop(
@@ -117,7 +110,6 @@ emitter.on("MatchOrder", async (params) => {
         }).catch((err) => console.log(err));
         break;
       }
-      // } else continue;
     }
   }
 });
@@ -169,7 +161,7 @@ let _getStockData = async function () {
   let top3MuaAll = await LenhGiaoDich.aggregate([
     {
       $match: {
-        createdDay: Util.getToday(),
+        createdDay: TimeHelper.getToday(),
         loaiLenh: orderType.buy,
         maCoPhieu: { $in: global.stocks[global.exchange] },
       },
@@ -203,7 +195,7 @@ let _getStockData = async function () {
     {
       $match: {
         maCoPhieu: { $in: global.stocks[global.exchange] },
-        createdDay: Util.getToday(),
+        createdDay: TimeHelper.getToday(),
         loaiLenh: orderType.sell,
       },
     },
@@ -233,7 +225,7 @@ let _getStockData = async function () {
     {
       $match: {
         maCoPhieu: { $in: global.stocks[global.exchange] },
-        createdDay: Util.getToday(),
+        createdDay: TimeHelper.getToday(),
       },
     },
     {
@@ -261,7 +253,7 @@ let _getStockData = async function () {
     {
       $match: {
         maCoPhieu: { $in: global.stocks[global.exchange] },
-        createdDay: Util.getToday(),
+        createdDay: TimeHelper.getToday(),
       },
     },
     {
@@ -282,10 +274,9 @@ let _getStockData = async function () {
     { $match: { tongKL: { $ne: 0 }, tongGT: { $ne: 0 } } },
   ]);
 
-  for (let stockId of global.stocks[global.exchange]) {
+  for (let coPhieu of coPhieuAll) {
     let stockData = {};
-
-    let coPhieu = coPhieuAll.find((x) => x._id === stockId);
+    let stockId = coPhieu._id;
     stockData.symbol = coPhieu._id;
     stockData.ceiling = coPhieu.giaTran;
     stockData.floor = coPhieu.giaSan;
@@ -324,15 +315,16 @@ let _getStockData = async function () {
 };
 
 let _initOrder = async (type, size) => {
-  const maTaiKhoan = "1586961656748";
-  const stocksList = await CoPhieu.find().select("_id");
+  const taiKhoan = await TaiKhoan.findOne({tenDangNhap: "Creater"});
+  const maTaiKhoan = taiKhoan._id;
+  const stocksList = await CoPhieu.find();
   const khoiLuong = [1000, 1500, 2000, 2500, 3000];
-  const fakePrices = [19000, 20000, 21000, 21500, 22000];
   let timestamp = Date.now();
   for (let i = 0; i < size; i++) {
+    let stockPosition = Math.round(Math.random() * (stocksList.length - 1))
     let stockId =
-      stocksList[Math.round(Math.random() * (stocksList.length - 1))]._id;
-    let gia = fakePrices[Math.round(Math.random() * (fakePrices.length - 1))];
+      stocksList[stockPosition]._id;
+    let gia = RandomHelper.random(stocksList[stockPosition].giaTran,stocksList[stockPosition].giaSan);
     const coPhieu = new LenhGiaoDich({
       maTaiKhoan: maTaiKhoan,
       maCoPhieu: stockId,
@@ -340,7 +332,7 @@ let _initOrder = async (type, size) => {
       khoiLuong: khoiLuong[Math.round(Math.random() * (khoiLuong.length - 1))],
       gia: gia,
       trangThai: "chờ khớp",
-      createdDay: Util.getToday(),
+      createdDay: TimeHelper.getToday(),
       createdTime: timestamp,
     });
     var next = await coPhieu.save();

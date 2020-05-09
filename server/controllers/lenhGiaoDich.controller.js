@@ -1,10 +1,10 @@
-const Util = require("../utils");
+const TimeHelper = require("../helpers/time");
 let CoPhieu = require("../models/coPhieu.model");
 let LenhGiaoDich = require("../models/lenhGiaoDich.model");
 const emitter = require("../emitter");
 
 let create = async (req, res) => {
-  const maTaiKhoan = req.signedCookies.userId;
+  //NOTE: thiếu mã cổ phiếu ở đây;
   const maCoPhieu = req.body.maCoPhieu;
   const checkMaCoPhieu = await CoPhieu.findById(maCoPhieu);
   if (!checkMaCoPhieu) {
@@ -21,7 +21,7 @@ let create = async (req, res) => {
     khoiLuong: khoiLuong,
     gia: gia,
     trangThai: "chờ khớp",
-    createdDay: Util.getToday(),
+    createdDay: TimeHelper.getToday(),
     createdTime: timestamp,
   });
   coPhieu
@@ -36,7 +36,7 @@ let create = async (req, res) => {
 };
 
 let getAll = (req, res) => {
-  LenhGiaoDich.find({ createdDay: Util.getToday() })
+  LenhGiaoDich.find({ createdDay: TimeHelper.getToday() })
     .then((lenh) => res.json(lenh))
     .catch((err) => res.status(400).json("Error: " + err));
 };

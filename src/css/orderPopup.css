@@ -1,3 +1,6 @@
+.form-control, a:hover {
+    color: black;
+}
 .orderPopup{
     margin-top: 25px;
 }

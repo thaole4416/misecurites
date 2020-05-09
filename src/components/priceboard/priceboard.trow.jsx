@@ -271,7 +271,7 @@ class TRow extends Component {
           <HighlighRow
             className={`${this.checkColor(reference, match)}  td ${color}`}
             style={{ width: "3.5%" }}
-            span={this.checkEmpty(match - reference)}
+            span={match ? this.checkEmpty(match - reference) : ""}
             isHighlight={match - reference - (P_match - P_reference)}
           />
           <HighlighRow

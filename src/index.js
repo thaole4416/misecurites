@@ -7,6 +7,7 @@ import './css/header.css'
 import './css/footer.css'
 import './css/priceboard.css'
 import './css/orderPopup.css'
+import './css/scrollbar.css'
 
 ReactDOM.render(
   <React.StrictMode>

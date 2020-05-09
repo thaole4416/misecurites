@@ -5,6 +5,7 @@ import { setStocks } from "../../redux/index";
 import { emitter } from "../../emitter";
 import OrderPopup from "../popup/order.popup";
 import SkyLight from "react-skylight";
+import { getAll } from "../../services/userService";
 
 const socket = socketIOClient(
   `http://localhost:${process.env.REACT_APP_IO_SERVER}`
@@ -29,7 +30,7 @@ class Menu extends Component {
   };
 
   initData = () => {
-    socket.emit("initData");
+    getAll();
   };
 
   changeExchange = (exchange) => {
@@ -49,18 +50,18 @@ class Menu extends Component {
 
   render() {
     let orderPopupStyle = {
-      width: "20%",
+      width: "25%",
       minHeight: "400px",
       position: "fixed",
-      top: "50%",
-      left: "105%",
-      height: "75%",
+      top: "35%",
+      left: "100%",
+      height: "100%",
       marginTop: "-200px",
       marginLeft: "-25%",
       backgroundColor: "rgb(33,32,39)",
       color: "white",
       font: "roboto",
-      "font-size": "1rem",
+      fontSize: "1rem",
     };
     const  exchange  =  localStorage.getItem("activeExchange") || this.state.exchange;
     return (

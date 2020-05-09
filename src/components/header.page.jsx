@@ -20,6 +20,7 @@ class Header extends Component {
   submitLogin = (loginPostData, e) => {
     e.preventDefault();
     this.props.login(loginPostData)
+    this.loginPopup.hide();
   };
 
   render() {
@@ -35,13 +36,14 @@ class Header extends Component {
       marginLeft: "-15%",
       left: "30%",
     };
+    const user = this.props.user && this.props.user.username ? this.props.user : JSON.parse(localStorage.getItem("userInfo"))
     return (
       <div className="header">
         <div className="login div">
-          <a href="javascipt:void(0)" onClick={() => this.loginPopup.show()}>
+          {user && user.username ? user.username : <a href="javascipt:void(0)" onClick={() => this.loginPopup.show()}>
             <span className="glyphicon glyphicon-log-in"></span>
             Đăng nhập
-          </a>
+          </a>}
         </div>
         <div className="flag">
           <span className="vi" />

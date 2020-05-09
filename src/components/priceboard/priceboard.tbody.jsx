@@ -3,6 +3,7 @@ import TRow from "./priceboard.trow";
 import { connect } from "react-redux";
 import { changeStocks } from "../../redux/index";
 import { emitter } from "../../emitter";
+import Scrollbar from "../scrollbar";
 class Tbody extends Component {
   constructor(props) {
     super(props);
@@ -34,28 +35,30 @@ class Tbody extends Component {
 
   render() {
     return (
-      <table className="table-row">
-        <tbody>
-          {this.state.isLoadEnd
-            ? this.props.stocks.map((stockData, index) => (
-                <TRow
-                  key={index}
-                  index={index}
-                  stock_data={stockData}
-                  click={this.click}
-                />
-              ))
-            : 
-          <tr colSpan="21">
-            <td>
-            <span>
-              LOADING...
-            </span>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
+      <div style={{ height: `calc(100vh - 175px)`, overflow: "hidden", marginTop: "4px" }}>
+        <Scrollbar>
+          <table className="table-row">
+            <tbody>
+              {this.state.isLoadEnd ? (
+                this.props.stocks.map((stockData, index) => (
+                  <TRow
+                    key={index}
+                    index={index}
+                    stock_data={stockData}
+                    click={this.click}
+                  />
+                ))
+              ) : (
+                <tr colSpan="21">
+                  <td>
+                    <span>LOADING...</span>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </Scrollbar>
+      </div>
     );
   }
 }

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Util = require('../utils')
+const TimeHelper = require('../helpers/time')
 const Schema = mongoose.Schema;
 
 const giaoDichKhopSchema = new Schema(
@@ -21,7 +21,7 @@ const giaoDichKhopSchema = new Schema(
     },
     khoiLuong: { type: Number, required: true },
     gia: { type: Number, required: true },
-    createdDay: { type: String, default: Util.getToday()},
+    createdDay: { type: String, default: TimeHelper.getToday()},
     matchedTime : {type: Number, default: Date.now()}
   },
   { collection: 'GiaoDichKhop' }

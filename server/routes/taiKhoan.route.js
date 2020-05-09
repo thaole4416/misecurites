@@ -37,7 +37,7 @@ route.post(base_uri + "/changePassword", taiKhoanController.changePassword);
 
 route.get(
   base_uri + "/",
-  authMiddleware.requireAuth,
+  authMiddleware.tokenCheck,
   taiKhoanController.getAll
 );
 
