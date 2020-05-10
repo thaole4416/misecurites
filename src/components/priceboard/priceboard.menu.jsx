@@ -6,6 +6,7 @@ import { emitter } from "../../emitter";
 import OrderPopup from "../popup/order.popup";
 import SkyLight from "react-skylight";
 import { getAll } from "../../services/userService";
+import HistoryPopup from "../popup/history.popup";
 
 const socket = socketIOClient(
   `http://localhost:${process.env.REACT_APP_IO_SERVER}`
@@ -62,14 +63,30 @@ class Menu extends Component {
       color: "white",
       font: "roboto",
       fontSize: "1rem",
+      padding: 0
+    };
+    let historyPopupStyle = {
+      width: "25%",
+      minHeight: "400px",
+      position: "fixed",
+      top: "35%",
+      left: "100%",
+      height: "100%",
+      marginTop: "-200px",
+      marginLeft: "-25%",
+      backgroundColor: "rgb(33,32,39)",
+      color: "white",
+      font: "roboto",
+      fontSize: "1rem",
+      padding: 0
     };
     const  exchange  =  localStorage.getItem("activeExchange") || this.state.exchange;
     return (
       <div className="menu">
-        <input type="text" className="input" placeholder="Nhập mã CP" />
+        {/* <input type="text" className="input" placeholder="Nhập mã CP" />
         <button className="add button-menu">
           <i className="fas fa-plus"></i>
-        </button>
+        </button> */}
 
         <button
           className={`btn-menu ${exchange === "HOSE" ? "active" : ""}`}
@@ -89,7 +106,7 @@ class Menu extends Component {
         >
           UPCOM
         </button>
-        <button className="btn-menu order" onClick={this.initData}>
+        <button className="btn-menu order" onClick={()=>this.historyPopup.show()}>
           Sổ lệnh <i className="fas fa-book"></i>
         </button>
         <button
@@ -105,6 +122,14 @@ class Menu extends Component {
           title="Đặt lệnh"
         >
           <OrderPopup />
+        </SkyLight>
+        <SkyLight
+          dialogStyles={historyPopupStyle}
+          hideOnOverlayClicked
+          ref={(ref) => (this.historyPopup = ref)}
+          title="Sổ lệnh"
+        >
+          <HistoryPopup />
         </SkyLight>
       </div>
     );

@@ -2,6 +2,7 @@ const actionTypes = {
   LOGIN: "LOGIN",
   LOGIN_SUCCESS: "LOGIN_SUCCESS",
   LOGIN_FAIL: "LOGIN_FAIL",
+  LOGOUT: "LOGOUT"
 };
 
 export const login = (data) => ({
@@ -17,6 +18,10 @@ export const loginSuccess = (payload) => ({
 export const loginFail = (err) => ({
   type: actionTypes.LOGIN_FAIL,
   payload: err,
+});
+
+export const logout = () => ({
+  type: actionTypes.LOGOUT,
 });
 
 const initialState = {
@@ -42,6 +47,9 @@ const user = (state, action) => {
     case actionTypes.LOGIN_FAIL:
       state = { ...state, username: "", id: "", message: action.payload };
       return { ...state };
+    case actionTypes.LOGOUT:
+      localStorage.clear("userInfo")
+      return { ...initialState };
     default:
       return state || initialState;
   }

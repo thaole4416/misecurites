@@ -13,4 +13,4 @@ sagaMiddleware.run(rootSaga);
 
 export default store;
 export { setStocks, changeStocks } from "./stocksReducer";
-export { login, loginSuccess, loginFail } from "./userReducer";
+export { login, loginSuccess, loginFail , logout } from "./userReducer";

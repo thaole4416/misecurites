@@ -163,3 +163,48 @@ a:hover {
   padding-bottom: 15px;
   text-align: center;
 }
+
+/* UserMenu */
+.userMenu {
+  position: relative;
+  display: inline;
+}
+
+.userMenu--dropdown {
+  position: absolute;
+  top: 140%;
+  width: 200px;
+  left: -175px;
+  z-index: 1000;
+  float: left;
+  min-width: 10rem;
+  margin: 0.125rem 0 0;
+  font-size: 1rem;
+  color: white;
+  text-align: left;
+  list-style: none;
+  background-color: rgb(33, 32, 39);
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+}
+
+.userMenu--dropdown__item {
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  padding: 0.25rem 1.5rem;
+  clear: both;
+  font-weight: 400;
+  color: white;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+}
+
+.userMenu--dropdown__item:hover {
+  background-color: rgba(247, 148, 29, 0.3);
+  color: white;
+  cursor: pointer;
+}

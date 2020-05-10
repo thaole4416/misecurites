@@ -315,7 +315,7 @@ let _getStockData = async function () {
 };
 
 let _initOrder = async (type, size) => {
-  const taiKhoan = await TaiKhoan.findOne({tenDangNhap: "Creater"});
+  const taiKhoan = await TaiKhoan.findOne({tenDangNhap: "Creator"});
   const maTaiKhoan = taiKhoan._id;
   const stocksList = await CoPhieu.find();
   const khoiLuong = [1000, 1500, 2000, 2500, 3000];

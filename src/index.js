@@ -8,6 +8,7 @@ import './css/footer.css'
 import './css/priceboard.css'
 import './css/orderPopup.css'
 import './css/scrollbar.css'
+import 'react-toastify/dist/ReactToastify.min.css'
 
 ReactDOM.render(
   <React.StrictMode>

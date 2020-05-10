@@ -11,6 +11,7 @@ class Tbody extends Component {
     this.state = {
       data: null,
       isLoadEnd: false,
+      isCheckHighLight: false,
     };
   }
 
@@ -18,7 +19,10 @@ class Tbody extends Component {
     emitter.on("loadingStocks", (isLoadEnd) => {
       if (isLoadEnd) {
         this.setState({ isLoadEnd: true });
-      } else this.setState({ isLoadEnd: false });
+        setTimeout(() => {
+          this.setState({ isCheckHighLight: true });
+        }, 1000);
+      } else this.setState({ isLoadEnd: false, isCheckHighLight: false });
     });
   };
 
@@ -35,7 +39,13 @@ class Tbody extends Component {
 
   render() {
     return (
-      <div style={{ height: `calc(100vh - 175px)`, overflow: "hidden", marginTop: "4px" }}>
+      <div
+        style={{
+          height: `calc(100vh - 175px)`,
+          overflow: "hidden",
+          marginTop: "4px",
+        }}
+      >
         <Scrollbar>
           <table className="table-row">
             <tbody>
@@ -46,6 +56,7 @@ class Tbody extends Component {
                     index={index}
                     stock_data={stockData}
                     click={this.click}
+                    isCheckHighLight={this.state.isCheckHighLight}
                   />
                 ))
               ) : (
