@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const taiSanCoPhieuSchema = new Schema(
+const soDuCoPhieuSchema = new Schema(
   {
     maTaiKhoan: {
       type: Schema.Types.ObjectId,
@@ -12,9 +12,9 @@ const taiSanCoPhieuSchema = new Schema(
     maCoPhieu: { type: String, required: true, ref: "CoPhieu" },
     khoiLuong: { type: Number, required: true },
   },
-  { timestamps: true ,collection: 'TaiSanCoPhieu'}
+  { timestamps: true ,collection: 'SoDuCoPhieu'}
 );
 
-const TaiSanCoPhieu = mongoose.model("TaiSanCoPhieu", taiSanCoPhieuSchema);
+const SoDuCoPhieu = mongoose.model("SoDuCoPhieu", soDuCoPhieuSchema);
 
-module.exports = TaiSanCoPhieu;
+module.exports = SoDuCoPhieu;

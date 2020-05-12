@@ -15,8 +15,9 @@ const taiKhoanSchema = new Schema(
     diaChi: { type: String, required: true },
     soDienThoai: { type: Number, required: true },
     email: { type: String, required: true },
+    createdTime: {type: String, default: Date.now()}
   },
-  { timestamps: true ,collection: 'TaiKhoan'}
+  { collection: 'TaiKhoan'}
 );
 
 const TaiKhoan = mongoose.model("TaiKhoan", taiKhoanSchema);

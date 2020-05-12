@@ -173,7 +173,7 @@ class RegisterPopup extends Component {
               </label>
             </div>
             <div className="form-group">
-              <button type="submit" className="btn btn-primary btn-lg">
+              <button type="submit" className="btn button btn-lg">
                 Đăng ký
               </button>
             </div>

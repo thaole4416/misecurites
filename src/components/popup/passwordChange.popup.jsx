@@ -1,72 +1,70 @@
 import React, { Component } from "react";
 
-class LoginPopup extends Component {
+class ChangePasswordPopup extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      loginData: {
-        username: "",
+      data : {
         password: "",
+        newPassword: "",
+        confirmNewPassword:""
       },
     };
   }
 
-  handleChangeUsername = (event) => {
-    this.state.loginData.username = event.target.value;
+  handleChangePassword = (event) => {
+    this.state.data.password = event.target.value;
     this.setState({ ...this.state });
   };
 
-  handleChangePassword = (event) => {
-    this.state.loginData.password = event.target.value;
+  handleChangeNewPassword = (event) => {
+    this.state.data.newPassword = event.target.value;
     this.setState({ ...this.state });
   };
+
+  handleChangeConfirmNewPassword = (event) => {
+    this.state.data.confirmNewPassword = event.target.value;
+    this.setState({ ...this.state });
+  };
+
 
   render() {
-    let { username, password } = this.state.loginData;
+    let { password,newPassword,confirmNewPassword } = this.state.data;
     return (
-      <div className="login-form">
-        <form>
-          <div className="form-group">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Tên đăng nhập"
-              required="required"
-              value={username}
-              onChange={this.handleChangeUsername}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="password"
-              className="form-control"
-              placeholder="Mật khẩu"
-              required="required"
-              value={password}
-              onChange={this.handleChangePassword}
-            />
-          </div>
-          <div className="form-group">
-            <button
-              onClick={(e) =>
-                this.props.submit(this.state.loginData,e)
-              }
-              className="button btn btn-block"
-            >
-              Đăng nhập
-            </button>
-          </div>
-          <div className="clearfix"></div>
-        </form>
-        <p className="text-center">
-          <a href="javascipt:void(0)" onClick={this.props.register}>
-            Đăng ký tài khoản
-          </a>
-        </p>
+      <div className="passwordChangePopup" style={{padding: 15}}>
+      <div class="form-group">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Nhập mật khẩu cũ"
+          value={password}
+          onChange={this.handleChangePassword}
+        />
       </div>
+      <div class="form-group">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Nhập mật khẩu mới"
+          value={newPassword}
+          onChange={this.handleChangeNewPassword}
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Nhập mật lại khẩu mới"
+          value={confirmNewPassword}
+          onChange={this.handleChangeConfirmNewPassword}
+        />
+      </div>
+      <hr />
+      <button className="btn btn-block button">Đổi mật khẩu</button>
+    </div>
     );
   }
 }
 
-export default LoginPopup;
+export default ChangePasswordPopup;
