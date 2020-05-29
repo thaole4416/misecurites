@@ -1,7 +1,9 @@
 const TaiKhoan = require("../models/taiKhoan.model");
-const bcrypt = require("../helpers/bcrypt")
+const SoDuTien = require("../models/soDuTien.model");
+const bcrypt = require("../helpers/bcrypt");
 const jwt = require("jsonwebtoken");
 const tokenList = {};
+const RandomHelper = require("../helpers/random")
 
 let getAll = (req, res) => {
   console.log(req.userInfo);
@@ -22,7 +24,7 @@ let login = async (req, res) => {
       const user = {
         id: taiKhoan._id,
         email: taiKhoan.email,
-        username: taiKhoan.tenDangNhap,
+        username: tenDangNhap,
       };
       const token = jwt.sign(user, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_LIFE,
@@ -39,7 +41,7 @@ let login = async (req, res) => {
         message: "Đăng nhập thành công",
         data: {
           id: taiKhoan._id,
-          username: tenDangNhap,
+          username: taiKhoan.tenTaiKhoan,
           token: token,
           refreshToken: refreshToken,
         },
@@ -53,7 +55,8 @@ let login = async (req, res) => {
 };
 
 let register = async (req, res) => {
-  let id = Date.now();
+  const lastestAcc = TaiKhoan.findOne().sort({createdTime : -1})
+  let id = RandomHelper.autoId(lastestAcc._id);
   let tenTaiKhoan = req.body.tenTaiKhoan;
   let tenDangNhap = req.body.tenDangNhap;
   let matKhau = req.body.matKhau;
@@ -84,6 +87,7 @@ let register = async (req, res) => {
       diaChi: diaChi,
       soDienThoai: soDienThoai,
       email: email,
+      createdTime: Date.now()
     });
     taiKhoan
       .save()
@@ -142,11 +146,20 @@ let changePassword = async (req, res) => {
 //   }
 // });
 
+let getInfo = async (req, res) => {
+  let _id = req.userInfo.id;
+  let taiKhoan = await TaiKhoan.findOne({ _id:_id });
+  console.log(taiKhoan)
+  let soDu = await SoDuTien.findOne({ maTaiKhoan: _id });
+  console.log(soDu)
+  res.json({ ...taiKhoan._doc, soDu : soDu.soDu });
+};
 
 module.exports = {
   login: login,
   register: register,
   getAll: getAll,
   changePassword: changePassword,
+  getInfo: getInfo,
   //   viewProfile: viewProfile,
 };

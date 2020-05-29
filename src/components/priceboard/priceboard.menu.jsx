@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import socketIOClient from "socket.io-client";
 import { connect } from "react-redux";
-import { setStocks } from "../../redux/index";
+import { setStocks, order, genOtp, verifyOtp } from "../../redux/index";
 import { emitter } from "../../emitter";
 import OrderPopup from "../popup/order.popup";
 import SkyLight from "react-skylight";
 import { getAll } from "../../services/userService";
 import HistoryPopup from "../popup/history.popup";
+import OtpPopup from "../popup/otp.popup";
 
 const socket = socketIOClient(
   `http://localhost:${process.env.REACT_APP_IO_SERVER}`
@@ -16,17 +17,23 @@ class Menu extends Component {
     super(props);
     this.state = {
       exchange: "HOSE",
+      order: {},
     };
   }
 
   listenEvent = () => {
     emitter.on("subcribeExchange", (exchange) => {
-      socket.emit(`subcribeExchange`, exchange);
+      socket.emit(`subcribeExchange`, {
+        exchange: exchange,
+        socketId: socket.id,
+      });
     });
     socket.on(`getStocks`, (stocksData) => {
-      console.log(stocksData)
       this.props.setStocks(stocksData);
-      emitter.emit("loadingStocks",true)
+      emitter.emit("loadingStocks", true);
+    });
+    emitter.on(`verifySuccess`, () => {
+      this.props.order(this.state.order);
     });
   };
 
@@ -36,20 +43,46 @@ class Menu extends Component {
 
   changeExchange = (exchange) => {
     this.setState({ exchange: exchange });
-    localStorage.setItem("activeExchange",exchange)
+    localStorage.setItem("activeExchange", exchange);
     emitter.emit(`subcribeExchange`, exchange);
-    emitter.emit("loadingStocks",false)
+    emitter.emit("loadingStocks", false);
   };
 
   componentDidMount() {
     this.listenEvent();
-    emitter.emit(`subcribeExchange`, localStorage.getItem("activeExchange") || this.state.exchange);
+    setTimeout(() => {
+      emitter.emit(
+        `subcribeExchange`,
+        localStorage.getItem("activeExchange") || this.state.exchange
+      );
+    }, 1000);
+  }
 
+  checkOtpCode = (order) => {
+    this.otpPopup.show();
+    // this.props.genOtp(this.props.user.token);
+    this.setState({ order });
+  };
+
+  verifyOtp = (otpCode, event) => {
+    event.preventDefault();
+    emitter.emit(`verifySuccess`)
+    // this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
+  };
+
+  reSendOtp() {
+    this.props.genOtp(this.props.user.token);
   }
 
   componentWillUnmount() {}
 
   render() {
+    let otpPopupStyle = {
+      backgroundColor: "rgb(33,32,39)",
+      width: "30%",
+      marginLeft: "-35%",
+      left: "70%",
+    };
     let orderPopupStyle = {
       width: "25%",
       minHeight: "400px",
@@ -63,7 +96,7 @@ class Menu extends Component {
       color: "white",
       font: "roboto",
       fontSize: "1rem",
-      padding: 0
+      padding: 0,
     };
     let historyPopupStyle = {
       width: "25%",
@@ -78,9 +111,10 @@ class Menu extends Component {
       color: "white",
       font: "roboto",
       fontSize: "1rem",
-      padding: 0
+      padding: 0,
     };
-    const  exchange  =  localStorage.getItem("activeExchange") || this.state.exchange;
+    const exchange =
+      localStorage.getItem("activeExchange") || this.state.exchange;
     return (
       <div className="menu">
         {/* <input type="text" className="input" placeholder="Nhập mã CP" />
@@ -106,7 +140,10 @@ class Menu extends Component {
         >
           UPCOM
         </button>
-        <button className="btn-menu order" onClick={()=>this.historyPopup.show()}>
+        <button
+          className="btn-menu order"
+          onClick={() => this.historyPopup.show()}
+        >
           Sổ lệnh <i className="fas fa-book"></i>
         </button>
         <button
@@ -121,7 +158,7 @@ class Menu extends Component {
           ref={(ref) => (this.orderPopup = ref)}
           title="Đặt lệnh"
         >
-          <OrderPopup />
+          <OrderPopup callback={this.checkOtpCode} />
         </SkyLight>
         <SkyLight
           dialogStyles={historyPopupStyle}
@@ -131,19 +168,36 @@ class Menu extends Component {
         >
           <HistoryPopup />
         </SkyLight>
+        <SkyLight
+          dialogStyles={otpPopupStyle}
+          hideOnOverlayClicked
+          ref={(ref) => (this.otpPopup = ref)}
+          title="Check mã OTP"
+        >
+          <OtpPopup
+            verifyOtp={this.verifyOtp}
+            reSendOtp={this.reSendOtp}
+            otp={this.props.otp}
+          />
+        </SkyLight>
       </div>
     );
   }
 }
 
-const mapStateToProps = ({ stocks }) => ({
+const mapStateToProps = ({ stocks, user, otp }) => ({
   stocks: stocks,
+  user: user,
+  otp: otp,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   setStocks: (stocksData) => {
     dispatch(setStocks(stocksData));
   },
+  order: (payload) => dispatch(order(payload)),
+  genOtp: (payload) => dispatch(genOtp(payload)),
+  verifyOtp: (payload) => dispatch(verifyOtp(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu);

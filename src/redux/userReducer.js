@@ -1,8 +1,9 @@
+import { setCookie, getCookie, deleteCookie } from "../helpers/cookies";
 const actionTypes = {
   LOGIN: "LOGIN",
   LOGIN_SUCCESS: "LOGIN_SUCCESS",
   LOGIN_FAIL: "LOGIN_FAIL",
-  LOGOUT: "LOGOUT"
+  LOGOUT: "LOGOUT",
 };
 
 export const login = (data) => ({
@@ -24,7 +25,7 @@ export const logout = () => ({
   type: actionTypes.LOGOUT,
 });
 
-const initialState = {
+const initialState = getCookie("userInfo") || {
   username: "",
   id: "",
   message: "",
@@ -40,15 +41,15 @@ const user = (state, action) => {
         id: action.payload.data.id,
         message: action.payload.message,
         token: action.payload.data.token,
-        refreshToken: action.payload.data.refreshToken
+        refreshToken: action.payload.data.refreshToken,
       };
-      localStorage.setItem("userInfo",JSON.stringify(state))
+      setCookie("userInfo", state, 60 * 15);
       return { ...state };
     case actionTypes.LOGIN_FAIL:
       state = { ...state, username: "", id: "", message: action.payload };
       return { ...state };
     case actionTypes.LOGOUT:
-      localStorage.clear("userInfo")
+      deleteCookie("userInfo");
       return { ...initialState };
     default:
       return state || initialState;

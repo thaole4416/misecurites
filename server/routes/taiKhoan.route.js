@@ -41,4 +41,10 @@ route.get(
   taiKhoanController.getAll
 );
 
+route.get(
+  base_uri + "/getInfo",
+  authMiddleware.tokenCheck,
+  taiKhoanController.getInfo
+);
+
 module.exports = route;

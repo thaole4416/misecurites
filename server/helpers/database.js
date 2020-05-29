@@ -7,7 +7,7 @@ const SoDuTien = require("../models/soDuTien.model");
 const bcrypt = require("../helpers/bcrypt");
 const emitter = require("../emitter");
 const TimeHelper = require("./time");
-const coPhieuData = require('./coPhieuData')
+const coPhieuData = require("./coPhieuData");
 
 let seedData = async () => {
   await _createSanGiaoDich();
@@ -32,6 +32,7 @@ let _createTaiKhoan = async () => {
   if (!result.length) {
     let data = [
       {
+        _id: "29A000001",
         tenTaiKhoan: "Phạm Đức Thành",
         tenDangNhap: "DragonLust",
         matKhau: await bcrypt.hash("123456"),
@@ -44,6 +45,7 @@ let _createTaiKhoan = async () => {
         email: "thanhpd@gmail.com",
       },
       {
+        _id: "29A000002",
         tenTaiKhoan: "Cao Thành Luân",
         tenDangNhap: "CloudMIS",
         matKhau: await bcrypt.hash("123456"),
@@ -56,8 +58,9 @@ let _createTaiKhoan = async () => {
         email: "luanct@gmail.com",
       },
       {
+        _id: "29A000003",
         tenTaiKhoan: "Lê Đình Thảo",
-        tenDangNhap: "Creater",
+        tenDangNhap: "Creator",
         matKhau: await bcrypt.hash("123456"),
         ngaySinh: "10/13/1998",
         CMND: "013509993",
@@ -66,9 +69,14 @@ let _createTaiKhoan = async () => {
         diaChi: "Hà Nội",
         soDienThoai: "0977098873",
         email: "admin@gmail.com",
-      }
+      },
     ];
     await TaiKhoan.collection.insertMany(data);
+    await SoDuTien.collection.insertMany([
+      { maTaiKhoan: "29A000001", soDu: 1000000 },
+      { maTaiKhoan: "29A000002", soDu: 1000000 },
+      { maTaiKhoan: "29A000003", soDu: 1000000 },
+    ]);
     console.log("Khởi tạo dữ liệu tài khoản thành công");
   } else {
     console.log("Đã có dữ liệu tài khoản");

@@ -4,11 +4,12 @@ import RegisterPopup from "./popup/register.popup";
 import InfoPopup from "./popup/info.popup";
 import ChangePasswordPopup from "./popup/passwordChange.popup";
 import SkyLight from "react-skylight";
-import { login, logout } from "../redux";
+import { login, logout, getAllStocks } from "../redux";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import logo from "../img/logo.png";
 import Clock from "./clock";
+import { getCookie } from "../helpers/cookies";
 
 class Header extends Component {
   constructor(props) {
@@ -52,6 +53,11 @@ class Header extends Component {
     this.setState({ showUserMenu: false });
     toast.success("Đăng xuất thành công");
   };
+
+  componentDidMount() {
+    this.props.getAllStocks();
+  }
+
   render() {
     let loginPopupStyle = {
       backgroundColor: "rgb(33,32,39)",
@@ -98,11 +104,11 @@ class Header extends Component {
     const user =
       this.props.user && this.props.user.username
         ? this.props.user
-        : JSON.parse(localStorage.getItem("userInfo"));
+        : getCookie("userInfo");
     return (
       <div className="header">
         <img src={logo} alt="" />
-        <Clock/>
+        <Clock />
         <div className="login div">
           {user && user.username ? (
             <div>
@@ -183,7 +189,7 @@ class Header extends Component {
           ref={(ref) => (this.changePasswordPopup = ref)}
           title="Đổi mật khẩu"
         >
-          <ChangePasswordPopup/>
+          <ChangePasswordPopup />
         </SkyLight>
         <SkyLight
           dialogStyles={infoPopuppStyle}
@@ -191,7 +197,7 @@ class Header extends Component {
           ref={(ref) => (this.infoPopup = ref)}
           title="Thông tin tài khoản"
         >
-          <InfoPopup/>
+          <InfoPopup />
         </SkyLight>
       </div>
     );
@@ -207,6 +213,9 @@ const mapDispatchToProps = (dispatch) => ({
   },
   logout: () => {
     dispatch(logout());
+  },
+  getAllStocks: () => {
+    dispatch(getAllStocks());
   },
 });
 

@@ -21,8 +21,8 @@ let create = (req, res) => {
 
 let getAll = (req, res) => {
   CoPhieu.find()
-    .then((coPhieu) => res.json(coPhieu))
-    .catch((err) => res.status(400).json("Error: " + err));
+    .then((coPhieu) => res.json({ data: coPhieu, status: "OK" }))
+    .catch((err) => res.status(400).json({ error: err, status: "FAIL" }));
 };
 
 let searchByExchangeId = async (req, res) => {

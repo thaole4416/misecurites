@@ -83,7 +83,7 @@ class TRow extends Component {
     if (value) {
       value = (value / 10).toFixed(1).toString().split(".");
       for (let i = value[0].length - 1; i >= 0; i--) {
-        if (index === 3) {
+        if (index === 2) {
           result = value[0][i] + "," + result;
           index = 0;
         } else {
@@ -96,6 +96,8 @@ class TRow extends Component {
   }
   checkEmpty(value, isTotalVal = false) {
     if (value && value !== 0) {
+      if (value == "ATO") return "ATO";
+      if (value == "ATC") return "ATC";
       if (Number.isInteger(value)) {
         return isTotalVal
           ? (value / 1000000).toFixed(2)
@@ -163,6 +165,12 @@ class TRow extends Component {
       sell_1: P_sell_1,
       sell_2: P_sell_2,
       sell_3: P_sell_3,
+      sVol_1: P_sVol_1,
+      sVol_2: P_sVol_2,
+      sVol_3: P_sVol_3,
+      bVol_1: P_bVol_1,
+      bVol_2: P_bVol_2,
+      bVol_3: P_bVol_3,
       match: P_match,
       mVol: P_mVol,
       // P_TT,
@@ -218,7 +226,7 @@ class TRow extends Component {
             className={`${this.checkColor(reference, buy_1)}  td`}
             style={{ width: "4.5%" }}
             span={this.checkKL(bVol_1)}
-            isHighlight={buy_1 - P_buy_1}
+            isHighlight={buy_1 - P_buy_1 || bVol_1 - P_bVol_1}
             isCheckHighLight={isCheckHighLight}
           />
           {/* <td
@@ -242,7 +250,7 @@ class TRow extends Component {
             className={`${this.checkColor(reference, buy_2)}  td`}
             style={{ width: "4.5%" }}
             span={this.checkKL(bVol_2)}
-            isHighlight={buy_2 - P_buy_2}
+            isHighlight={buy_2 - P_buy_2 || bVol_2 - P_bVol_2}
             isCheckHighLight={isCheckHighLight}
           />
           <HighlightRow
@@ -258,7 +266,7 @@ class TRow extends Component {
             className={`${this.checkColor(reference, buy_3)}  td`}
             style={{ width: "4.5%" }}
             span={this.checkKL(bVol_3)}
-            isHighlight={buy_3 - P_buy_3}
+            isHighlight={buy_3 - P_buy_3 || bVol_3 - P_bVol_3}
             isCheckHighLight={isCheckHighLight}
           />
           <HighlightRow
@@ -276,7 +284,7 @@ class TRow extends Component {
               width: "4%",
             }}
             span={this.checkKL(mVol)}
-            isHighlight={mVol - P_mVol}
+            isHighlight={match - P_match || mVol - P_mVol}
             isCheckHighLight={isCheckHighLight}
           />
           <HighlightRow
@@ -297,7 +305,7 @@ class TRow extends Component {
             className={`${this.checkColor(reference, sell_1)}  td`}
             style={{ width: "4.5%" }}
             span={this.checkKL(sVol_1)}
-            isHighlight={sell_1 - P_sell_1}
+            isHighlight={sell_1 - P_sell_1 || sVol_1 - P_sVol_1}
             isCheckHighLight={isCheckHighLight}
           />
           <HighlightRow
@@ -311,7 +319,7 @@ class TRow extends Component {
             className={`${this.checkColor(reference, sell_2)}  td`}
             style={{ width: "4.5%" }}
             span={this.checkKL(sVol_2)}
-            isHighlight={sell_2 - P_sell_2}
+            isHighlight={sell_2 - P_sell_2 || sVol_2 - P_sVol_2}
             isCheckHighLight={isCheckHighLight}
           />
           <HighlightRow
@@ -325,7 +333,7 @@ class TRow extends Component {
             className={`${this.checkColor(reference, sell_3)}  td`}
             style={{ width: "4.5%" }}
             span={this.checkKL(sVol_3)}
-            isHighlight={sell_3 - P_sell_3}
+            isHighlight={sell_3 - P_sell_3 || sVol_3 - P_sVol_3}
             isCheckHighLight={isCheckHighLight}
           />
         </tr>

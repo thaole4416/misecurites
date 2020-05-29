@@ -12,7 +12,7 @@ const lenhGiaoDichSchema = new Schema(
     maCoPhieu: { type: String, required: true, ref: "CoPhieu" },
     loaiLenh: { type: String, required: true },
     khoiLuong: { type: Number, required: true },
-    gia: { type: Number, required: true },
+    gia: { type: String, required: true },
     trangThai: { type: String, required: true },
     createdDay: { type: String, required: true },
     createdTime: { type: String, required: true },

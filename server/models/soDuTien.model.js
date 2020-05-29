@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const soDuTienSchema = new Schema(
   {
-    maTaiKhoan: {type: Schema.Types.ObjectId, ref: 'TaiKhoan'},
+    maTaiKhoan: {type: String, ref: 'TaiKhoan'},
     soDu: { type: Number, required: true },
   },
   { timestamps: true,collection: 'SoDuTien' }

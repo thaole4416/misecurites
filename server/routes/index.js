@@ -3,7 +3,15 @@ const sanGiaoDichRoute = require("./sanGiaoDich.route");
 const coPhieuRoute = require("./coPhieu.route");
 const lenhGiaoDichRoute = require("./lenhGiaoDich.route");
 const giaoDichKhopRoute = require("./giaoDichKhop.route");
+const otpRoute = require("./otp.route");
 
-const routes = [taiKhoanRoute, sanGiaoDichRoute, coPhieuRoute,lenhGiaoDichRoute,giaoDichKhopRoute];
+const routes = [
+  taiKhoanRoute,
+  sanGiaoDichRoute,
+  coPhieuRoute,
+  lenhGiaoDichRoute,
+  giaoDichKhopRoute,
+  otpRoute,
+];
 
 module.exports = routes;
