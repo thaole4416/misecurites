@@ -37,6 +37,23 @@ function excuteCodeAtTime(fn, time) {
     }, 60000);
   }, msTillExcute);
 }
+/**
+ *
+ * @param [] timeObj [hour,minute,second, milisecond]
+ */
+function getTimeSpan(timeObj) {
+  const now = new Date();
+  const timeSpan = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    timeObj[0],
+    timeObj[1],
+    timeObj[2],
+    timeObj[3]
+  );
+  return timeSpan;
+}
 
 /**
  * return
@@ -50,80 +67,14 @@ function excuteCodeAtTime(fn, time) {
 function getTradingSession(exchange) {
   const now = new Date();
   const timeNow = now.getTime();
-  const start_DinhKy_Mo = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    9,
-    0,
-    0,
-    0
-  );
-  const end_DinhKy_Mo = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    9,
-    15,
-    0,
-    0
-  );
-  const start_DinhKy_Dong = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    14,
-    30,
-    0,
-    0
-  );
-  const end_DinhKy_Dong = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    14,
-    45,
-    0,
-    0
-  );
-
-  const start_SauGio = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    14,
-    45,
-    0,
-    0
-  );
-  const end_SauGio = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    15,
-    0,
-    0,
-    0
-  );
-
-  const start_Nghi = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    11,
-    30,
-    0,
-    0
-  );
-  const end_Nghi = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    13,
-    0,
-    0,
-    0
-  );
+  const start_DinhKy_Mo = getTimeSpan([9, 0, 0, 0]);
+  const end_DinhKy_Mo = getTimeSpan([9, 15, 0, 0]);
+  const start_DinhKy_Dong = getTimeSpan([14, 30, 0, 0]);
+  const end_DinhKy_Dong = getTimeSpan([14, 45, 0, 0]);
+  const start_SauGio = getTimeSpan([14, 45, 0, 0]);
+  const end_SauGio = getTimeSpan([15, 0, 0, 0]);
+  const start_Nghi = getTimeSpan([11, 30, 0, 0]);
+  const end_Nghi = getTimeSpan([13, 0, 0, 0]);
 
   if (
     timeNow >= start_DinhKy_Mo &&
@@ -169,4 +120,5 @@ module.exports = {
   getToday: getToday,
   excuteCodeAtTime: excuteCodeAtTime,
   getTradingSession: getTradingSession,
+  getTimeSpan: getTimeSpan
 };

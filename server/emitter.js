@@ -259,11 +259,11 @@ let _capNhatLaiLenh = async function (
   let trangThaiMua = luongMuaConLai ? "đang khớp" : "đã khớp";
   let trangThaiBan = luongBanConLai ? "đang khớp" : "đã khớp";
   await LenhGiaoDich.findByIdAndUpdate(lenhMua._id, {
-    khoiLuong: luongMuaConLai,
+    khoiLuongConLai: luongMuaConLai,
     trangThai: trangThaiMua,
   }).catch((err) => console.log(err));
   await LenhGiaoDich.findByIdAndUpdate(lenhBan._id, {
-    khoiLuong: luongBanConLai,
+    khoiLuongConLai: luongBanConLai,
     trangThai: trangThaiBan,
   }).catch((err) => console.log(err));
 };
@@ -655,7 +655,7 @@ let _initOrder = async (type, size) => {
       loaiLenh: type,
       khoiLuong: khoiLuong[Math.round(Math.random() * (khoiLuong.length - 1))],
       gia: gia,
-      trangThai: "chờ khớp",
+      trangThai: "đã xác nhận",
       createdDay: TimeHelper.getToday(),
       createdTime: timestamp,
     });
