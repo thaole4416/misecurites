@@ -47,4 +47,9 @@ route.get(
   taiKhoanController.getInfo
 );
 
+route.delete(
+  base_uri + "/",
+  taiKhoanController.clearAll
+);
+
 module.exports = route;

@@ -3,7 +3,7 @@ const SoDuTien = require("../models/soDuTien.model");
 const bcrypt = require("../helpers/bcrypt");
 const jwt = require("jsonwebtoken");
 const tokenList = {};
-const RandomHelper = require("../helpers/random")
+const RandomHelper = require("../helpers/random");
 
 let getAll = (req, res) => {
   console.log(req.userInfo);
@@ -54,9 +54,10 @@ let login = async (req, res) => {
   }
 };
 
-let register = async (req, res) => {
-  const lastestAcc = TaiKhoan.findOne().sort({createdTime : -1})
-  let id = RandomHelper.autoId(lastestAcc._id);
+async function register(req, res) {
+  const lastestAcc = await TaiKhoan.find().sort({ _id: -1 });
+  console.log(lastestAcc)
+  let id = RandomHelper.autoId(lastestAcc[0]._id);
   let tenTaiKhoan = req.body.tenTaiKhoan;
   let tenDangNhap = req.body.tenDangNhap;
   let matKhau = req.body.matKhau;
@@ -69,12 +70,23 @@ let register = async (req, res) => {
   let email = req.body.email;
 
   let hashNewPassword = await bcrypt.hash(matKhau);
-  if (
-    !(await TaiKhoan.findOne(
-      { tenDangNhap: tenDangNhap },
-      (data) => data
-    ).exec())
-  ) {
+  let errs = [];
+  if (!CMND.match(/^(\d{9}|\d{12})$/)) errs.push("CMND không hợp lệ");
+  if (!email.match(/\S+@\S+\.\S+/)) errs.push("Email không hợp lệ");
+  let checkTenDangNhap = await TaiKhoan.find({ tenDangNhap: tenDangNhap });
+  if (checkTenDangNhap) errs.push("Tên đăng nhập dã tồn tại");
+
+  let checkCMND = await TaiKhoan.find({ CMND: CMND });
+  if (checkCMND) errs.push("CMND dã tồn tại");
+
+  let checkSDT = await TaiKhoan.find({ soDienThoai: soDienThoai });
+  if (checkSDT) errs.push("Số điện thoại dã tồn tại");
+
+  let checkEmail = await TaiKhoan.find({ email: email });
+  if (checkEmail) errs.push("Email dã tồn tại");
+
+  console.log(errs)
+  if (!errs.length) {
     var taiKhoan = new TaiKhoan({
       _id: id,
       tenTaiKhoan: tenTaiKhoan,
@@ -87,16 +99,16 @@ let register = async (req, res) => {
       diaChi: diaChi,
       soDienThoai: soDienThoai,
       email: email,
-      createdTime: Date.now()
+      createdTime: Date.now(),
     });
     taiKhoan
       .save()
       .then((doc) => res.json(doc))
       .catch((err) => res.status(400).json("Error: " + err));
   } else {
-    res.status(400).json("Tên đăng nhập đã tồn tại");
+    res.json({ status: "FAIL", message: errs });
   }
-};
+}
 
 let changePassword = async (req, res) => {
   let _id = req.body.id;
@@ -148,18 +160,23 @@ let changePassword = async (req, res) => {
 
 let getInfo = async (req, res) => {
   let _id = req.userInfo.id;
-  let taiKhoan = await TaiKhoan.findOne({ _id:_id });
-  console.log(taiKhoan)
+  let taiKhoan = await TaiKhoan.findOne({ _id: _id });
+  console.log(taiKhoan);
   let soDu = await SoDuTien.findOne({ maTaiKhoan: _id });
-  console.log(soDu)
-  res.json({ ...taiKhoan._doc, soDu : soDu.soDu });
+  console.log(soDu);
+  res.json({ status: "OK", data: { ...taiKhoan._doc, soDu: soDu.soDu } });
 };
-
+function clearAll(req, res) {
+  TaiKhoan.deleteMany()
+    .then((lenh) => res.json(lenh))
+    .catch((err) => res.status(400).json("Error: " + err));
+}
 module.exports = {
   login: login,
   register: register,
   getAll: getAll,
   changePassword: changePassword,
   getInfo: getInfo,
+  clearAll: clearAll,
   //   viewProfile: viewProfile,
 };

@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const soDuCoPhieuSchema = new Schema(
   {
     maTaiKhoan: {
-      type: Schema.Types.ObjectId,
+      type: String,
       required: true,
       ref: "TaiKhoan",
     },

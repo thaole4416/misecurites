@@ -14,6 +14,7 @@ function genOtp(req, res) {
     otpCode: otpCode,
     createdTime: Date.now(),
   });
+  console.log(otpCode)
   genOtp.save();
   mailHelper.sendMailOtpCode("ledinhthao131098@gmail.com", otpCode, res);
 }
@@ -26,7 +27,6 @@ async function verifyOtp(req, res) {
     maTaiKhoan: req.userInfo.id,
     email: req.userInfo.email,
   }).sort({ createdTime: -1 });
-  console.log(otpObjInDatabase)
   //check otp voi otp trong email
   if (otpCodeToVerify == otpObjInDatabase.otpCode) {
     if (checkTime - 60 * 1000 <= otpObjInDatabase.createdTime) {

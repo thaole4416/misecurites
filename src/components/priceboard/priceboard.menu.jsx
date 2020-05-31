@@ -1,7 +1,13 @@
 import React, { Component } from "react";
 import socketIOClient from "socket.io-client";
 import { connect } from "react-redux";
-import { setStocks, order, genOtp, verifyOtp } from "../../redux/index";
+import {
+  setStocks,
+  order,
+  genOtp,
+  verifyOtp,
+  changeExchange,
+} from "../../redux/index";
 import { emitter } from "../../emitter";
 import OrderPopup from "../popup/order.popup";
 import SkyLight from "react-skylight";
@@ -22,12 +28,6 @@ class Menu extends Component {
   }
 
   listenEvent = () => {
-    emitter.on("subcribeExchange", (exchange) => {
-      socket.emit(`subcribeExchange`, {
-        exchange: exchange,
-        socketId: socket.id,
-      });
-    });
     socket.on(`getStocks`, (stocksData) => {
       this.props.setStocks(stocksData);
       emitter.emit("loadingStocks", true);
@@ -43,18 +43,17 @@ class Menu extends Component {
 
   changeExchange = (exchange) => {
     this.setState({ exchange: exchange });
+    this.props.changeExchange(exchange);
     localStorage.setItem("activeExchange", exchange);
-    emitter.emit(`subcribeExchange`, exchange);
+    socket.emit(`getExchangeData`);
     emitter.emit("loadingStocks", false);
   };
 
   componentDidMount() {
     this.listenEvent();
     setTimeout(() => {
-      emitter.emit(
-        `subcribeExchange`,
-        localStorage.getItem("activeExchange") || this.state.exchange
-      );
+      console.log("get exchange data");
+      socket.emit(`getExchangeData`);
     }, 1000);
   }
 
@@ -66,7 +65,7 @@ class Menu extends Component {
 
   verifyOtp = (otpCode, event) => {
     event.preventDefault();
-    emitter.emit(`verifySuccess`)
+    emitter.emit(`verifySuccess`);
     // this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
   };
 
@@ -144,13 +143,22 @@ class Menu extends Component {
           className="btn-menu order"
           onClick={() => this.historyPopup.show()}
         >
-          Sổ lệnh <i className="fas fa-book"></i>
+          Lịch sử GD
+          {/* <i className="fas fa-book"></i> */}
+        </button>
+        <button
+          className="btn-menu order"
+          onClick={() => this.historyPopup.show()}
+        >
+          Danh mục
+          {/* <i className="fas fa-book"></i> */}
         </button>
         <button
           className="btn-menu order"
           onClick={() => this.orderPopup.show()}
         >
-          Đặt lệnh <i className="fas fa-plus"></i>
+          Đặt lệnh
+          {/* <i className="fas fa-plus"></i> */}
         </button>
         <SkyLight
           dialogStyles={orderPopupStyle}
@@ -198,6 +206,7 @@ const mapDispatchToProps = (dispatch) => ({
   order: (payload) => dispatch(order(payload)),
   genOtp: (payload) => dispatch(genOtp(payload)),
   verifyOtp: (payload) => dispatch(verifyOtp(payload)),
+  changeExchange: (exchange) => dispatch(changeExchange(exchange)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu);

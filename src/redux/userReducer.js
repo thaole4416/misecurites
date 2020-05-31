@@ -1,8 +1,13 @@
 import { setCookie, getCookie, deleteCookie } from "../helpers/cookies";
+import { act } from "react-dom/test-utils";
 const actionTypes = {
   LOGIN: "LOGIN",
   LOGIN_SUCCESS: "LOGIN_SUCCESS",
   LOGIN_FAIL: "LOGIN_FAIL",
+  DANH_MUC: "DANH_MUC",
+  DANH_MUC_SUCCESS: "DANH_MUC_SUCCESS",
+  THONG_TIN: "THONG_TIN",
+  THONG_TIN_SUCCESS: "THONG_TIN_SUCCESS",
   LOGOUT: "LOGOUT",
 };
 
@@ -25,6 +30,26 @@ export const logout = () => ({
   type: actionTypes.LOGOUT,
 });
 
+export const getDanhMuc = (payload) => ({
+  type: actionTypes.DANH_MUC,
+  payload: payload,
+});
+
+export const getDanhMucSuccess = (payload) => ({
+  type: actionTypes.DANH_MUC_SUCCESS,
+  payload: payload,
+});
+
+export const getThongTin = (payload) => ({
+  type: actionTypes.THONG_TIN,
+  payload: payload,
+});
+
+export const getThongTinSuccess = (payload) => ({
+  type: actionTypes.THONG_TIN_SUCCESS,
+  payload: payload,
+});
+
 const initialState = getCookie("userInfo") || {
   username: "",
   id: "",
@@ -43,8 +68,12 @@ const user = (state, action) => {
         token: action.payload.data.token,
         refreshToken: action.payload.data.refreshToken,
       };
-      setCookie("userInfo", state, 60 * 15);
+      setCookie("userInfo", state, 60 * 60);
       return { ...state };
+    case actionTypes.DANH_MUC_SUCCESS:
+      return { ...state, danhMuc: action.payload.data  };
+    case actionTypes.THONG_TIN_SUCCESS:
+      return { ...state, info: action.payload.data, soDu: action.payload.data.soDu};
     case actionTypes.LOGIN_FAIL:
       state = { ...state, username: "", id: "", message: action.payload };
       return { ...state };

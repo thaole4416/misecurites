@@ -4,7 +4,7 @@ import RegisterPopup from "./popup/register.popup";
 import InfoPopup from "./popup/info.popup";
 import ChangePasswordPopup from "./popup/passwordChange.popup";
 import SkyLight from "react-skylight";
-import { login, logout, getAllStocks } from "../redux";
+import { login, logout, getAllStocks,getThongTin,getDanhMuc } from "../redux";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import logo from "../img/logo.png";
@@ -56,6 +56,10 @@ class Header extends Component {
 
   componentDidMount() {
     this.props.getAllStocks();
+    if(this.props.user || getCookie("userInfo")){
+      this.props.getThongTin(this.props.user.token);
+      this.props.getDanhMuc(this.props.user.token);
+    }
   }
 
   render() {
@@ -216,6 +220,12 @@ const mapDispatchToProps = (dispatch) => ({
   },
   getAllStocks: () => {
     dispatch(getAllStocks());
+  },
+  getThongTin: (payload) => {
+    dispatch(getThongTin(payload));
+  },
+  getDanhMuc: (payload) => {
+    dispatch(getDanhMuc(payload));
   },
 });
 

@@ -4,19 +4,21 @@ const LenhGiaoDich = require("../models/lenhGiaoDich.model");
 const SanGiaoDich = require("../models/sanGiaoDich.model");
 const TaiKhoan = require("../models/taiKhoan.model");
 const SoDuTien = require("../models/soDuTien.model");
+const SoDuCoPhieu = require("../models/soDuCoPhieu.model");
 const bcrypt = require("../helpers/bcrypt");
 const emitter = require("../emitter");
 const TimeHelper = require("./time");
 const coPhieuData = require("./coPhieuData");
 
-let seedData = async () => {
+async function seedData() {
   await _createSanGiaoDich();
   await _createTaiKhoan();
   await _createCoPhieu();
   await _createGiaoDich();
-};
+  await _createDanhMuc();
+}
 
-let _createSanGiaoDich = async () => {
+async function _createSanGiaoDich() {
   let result = await SanGiaoDich.find();
   if (!result.length) {
     let data = [{ _id: "HOSE" }, { _id: "HNX" }, { _id: "UPCOM" }];
@@ -25,9 +27,9 @@ let _createSanGiaoDich = async () => {
   } else {
     console.log("Đã có dữ liệu sàn giao dịch");
   }
-};
+}
 
-let _createTaiKhoan = async () => {
+async function _createTaiKhoan() {
   let result = await TaiKhoan.find();
   if (!result.length) {
     let data = [
@@ -81,9 +83,9 @@ let _createTaiKhoan = async () => {
   } else {
     console.log("Đã có dữ liệu tài khoản");
   }
-};
+}
 
-let _createGiaoDich = async () => {
+async function _createGiaoDich() {
   let result = await LenhGiaoDich.find({ createdDay: TimeHelper.getToday() });
   if (!result.length) {
     emitter.emit("initData");
@@ -91,8 +93,8 @@ let _createGiaoDich = async () => {
   } else {
     console.log("Đã có dữ liệu giao dịch");
   }
-};
-let _createCoPhieu = async () => {
+}
+async function _createCoPhieu() {
   let result = await CoPhieu.find();
   if (!result.length) {
     let data = coPhieuData;
@@ -101,7 +103,40 @@ let _createCoPhieu = async () => {
   } else {
     console.log("Đã có dữ liệu cổ phiếu");
   }
-};
+}
+
+async function _createDanhMuc() {
+  let result = await SoDuCoPhieu.find();
+  if (!result.length) {
+    let data = [];
+    try {
+      let coPhieus = await CoPhieu.find();
+      for (let i = 0; i < 5; i++) {
+        data.push(
+          {
+            maCoPhieu: coPhieus[Math.round(Math.random() * coPhieus.length)]._id,
+            maTaiKhoan: "29A000001",
+            khoiLuong: 100000,
+          },
+          {
+            maCoPhieu: coPhieus[Math.round(Math.random() * coPhieus.length)]._id,
+            maTaiKhoan: "29A000002",
+            khoiLuong: 100000,
+          },
+          {
+            maCoPhieu: coPhieus[Math.round(Math.random() * coPhieus.length)]._id,
+            maTaiKhoan: "29A000003",
+            khoiLuong: 100000,
+          }
+        );
+      }
+    } catch (error) {}
+    await SoDuCoPhieu.collection.insertMany(data);
+    console.log("Khởi tạo dữ liệu danh muc cổ phiếu thành công");
+  } else {
+    console.log("Đã có dữ liệu danh muc cổ phiếu");
+  }
+}
 
 module.exports = {
   seedData: seedData,

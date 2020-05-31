@@ -38,6 +38,7 @@ class Tbody extends Component {
   };
 
   render() {
+    let index = 0;
     return (
       <div
         style={{
@@ -50,15 +51,17 @@ class Tbody extends Component {
           <table className="table-row">
             <tbody>
               {this.state.isLoadEnd ? (
-                this.props.stocks.map((stockData, index) => (
-                  <TRow
-                    key={index}
-                    index={index}
-                    stock_data={stockData}
-                    click={this.click}
-                    isCheckHighLight={this.state.isCheckHighLight}
-                  />
-                ))
+                this.props.stocks.map((stockData) =>
+                  stockData.exchange == this.props.exchange ? (
+                    <TRow
+                      key={index}
+                      index={index++}
+                      stock_data={stockData}
+                      click={this.click}
+                      isCheckHighLight={this.state.isCheckHighLight}
+                    />
+                  ) : null
+                )
               ) : (
                 <tr colSpan="21">
                   <td>
@@ -74,8 +77,9 @@ class Tbody extends Component {
   }
 }
 
-const mapStateToProps = ({ stocks }) => ({
+const mapStateToProps = ({ stocks, exchange }) => ({
   stocks: stocks,
+  exchange: exchange,
 });
 
 const mapDispatchToProps = (dispatch) => ({

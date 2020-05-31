@@ -17,6 +17,7 @@ const lenhGiaoDichSchema = new Schema(
     trangThai: { type: String, required: true },
     createdDay: { type: String, required: true },
     createdTime: { type: String, required: true },
+    preId: {type: Schema.Types.ObjectId, required: false}
   },
   { collection: "LenhGiaoDich" }
 );

@@ -26,6 +26,12 @@ route.get(
   authMiddleware.tokenCheck,
   lenhGiaoDichController.test
 );
+route.get(
+  base_uri + "/test2",
+  authMiddleware.tokenCheck,
+  lenhGiaoDichController.test2
+);
 route.get(base_uri + "/ATX", helper.ATX);
+route.get(base_uri + "/history", authMiddleware.tokenCheck, lenhGiaoDichController.history);
 
 module.exports = route;

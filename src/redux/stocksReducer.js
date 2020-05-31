@@ -13,6 +13,8 @@ let data = [
 const actionTypes = {
   CHANGE_STOCKS: "CHANGE_STOCKS",
   SET_STOCKS: "SET_STOCKS",
+  LICH_SU: "LICH_SU",
+  LICH_SU_SUCCESS: "LICH_SU_SUCCESS",
 };
 
 export const changeStocks = () => ({
@@ -22,6 +24,15 @@ export const changeStocks = () => ({
 export const setStocks = (stocksData) => ({
   type: actionTypes.SET_STOCKS,
   payload: stocksData,
+});
+
+export const getHistory = (payload) => ({
+  type: actionTypes.LICH_SU,
+  payload: payload,
+});
+export const getHistorySuccess = (payload) => ({
+  type: actionTypes.LICH_SU_SUCCESS,
+  payload: payload,
 });
 
 const stocks = (state = data, action) => {

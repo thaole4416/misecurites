@@ -4,6 +4,7 @@ const coPhieuRoute = require("./coPhieu.route");
 const lenhGiaoDichRoute = require("./lenhGiaoDich.route");
 const giaoDichKhopRoute = require("./giaoDichKhop.route");
 const otpRoute = require("./otp.route");
+const soDuCoPhieuRoute = require("./soDuCoPhieu.route");
 
 const routes = [
   taiKhoanRoute,
@@ -12,6 +13,7 @@ const routes = [
   lenhGiaoDichRoute,
   giaoDichKhopRoute,
   otpRoute,
+  soDuCoPhieuRoute
 ];
 
 module.exports = routes;

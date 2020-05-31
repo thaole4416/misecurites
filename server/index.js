@@ -23,18 +23,11 @@ io.on("connection", function (socket) {
   socket.on("initData", () => {
     emitter.emit("initData");
   });
-  emitter.on("returnExchangeData", (param) => {
-    const { stocksData, socketId } = param;
-    if(socketId)
-    io.to(socketId).emit("getStocks", stocksData);
-    else
+  emitter.on("returnExchangeData", (stocksData) => {
     socket.emit("getStocks",stocksData)
   });
-  socket.on("subcribeExchange", function (param) {
-    const { exchange, socketId } = param;
-    console.log("subcribe " + exchange + socketId);
-    global.exchange = exchange;
-    emitter.emit("getExchangeData", { exchange: exchange, socketId: socketId });
+  socket.on("getExchangeData", function () {
+    emitter.emit("getExchangeData");
   });
 });
 server.listen(port, () => console.log(`Server is running on port ${port}`));

@@ -32,3 +32,29 @@ export const getAll = async (token) => {
   });
   console.log(x)
 };
+
+export const getInfo = async (action) => {
+  let response = await axios({
+    method: "get",
+    url: BASE_URL + "/taiKhoan/getInfo",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${action.payload}`,
+    },
+  });
+  return response.data;
+};
+
+export const getDanhMuc = async (action) => {
+  let response = await axios({
+    method: "get",
+    url: BASE_URL + "/soDuCoPhieu",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${action.payload}`,
+    },
+  });
+  return response.data;
+};

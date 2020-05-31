@@ -1,6 +1,5 @@
 import { call, put, takeEvery, takeLatest } from "redux-saga/effects";
-import { login } from "../services/userService";
-import { loginSuccess, loginFail } from "../redux";
+import { login ,getInfo,getDanhMuc} from "../services/userService";
 
 export function* loginSaga(action) {
   try {
@@ -23,6 +22,52 @@ export function* loginSaga(action) {
     yield put({
       type: "LOGIN_FAIL",
       payload: err,
+    });
+  }
+}
+
+export function* getDanhMucSaga(action) {
+  try {
+    const result = yield call(getDanhMuc, action);
+    if (result.status == "OK") {
+      yield put({
+        type: "DANH_MUC_SUCCESS",
+        payload: result,
+      });
+    }
+    else if (result.status == "FAIL"){
+      yield put({
+        type: "DANH_MUC_SUCCESS",
+        payload: { data : {}},
+      });
+    }
+  } catch (err) {
+    yield put({
+      type: "DANH_MUC_SUCCESS",
+      payload: { data : {err:err}},
+    });
+  }
+}
+
+export function* getInfoSaga(action) {
+  try {
+    const result = yield call(getInfo, action);
+    if (result.status == "OK") {
+      yield put({
+        type: "THONG_TIN_SUCCESS",
+        payload: result,
+      });
+    }
+    else if (result.status == "FAIL"){
+      yield put({
+        type: "THONG_TIN_SUCCESS",
+        payload: { data : {}},
+      });
+    }
+  } catch (err) {
+    yield put({
+      type: "THONG_TIN_SUCCESS",
+      payload: { data : {err:err}},
     });
   }
 }

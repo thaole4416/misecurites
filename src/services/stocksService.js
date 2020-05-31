@@ -45,3 +45,16 @@ export const order = async (action) => {
   });
   return response.data;
 };
+
+export const getHistory = async (action) => {
+  let response = await axios({
+    method: "get",
+    url: BASE_URL + "/lenhGiaoDich/history",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${action.payload}`,
+    },
+  });
+  return response.data;
+};
