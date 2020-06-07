@@ -1,5 +1,5 @@
 .footer {
-    background-color: #181818;
+    background-color: rgb(228, 230, 233);
     position: fixed;
     right: 0;
     bottom: 0;
@@ -13,7 +13,7 @@
 .td-ft {
     display: block;
     /* margin: auto; */
-    color: white;
+    color: rgb(21, 27, 30);;
     font-size: 12px;
     text-align: center;
     width: 100%;

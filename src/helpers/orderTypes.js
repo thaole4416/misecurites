@@ -2,14 +2,14 @@ export function getOrderTypes(exchange) {
   switch (exchange) {
     case "HOSE":
       if (getTradingSession("HOSE") === -1 || getTradingSession("HOSE") === 0)
-        return [];
+        return ["Không có lệnh phù hợp"];
       else if (getTradingSession("HOSE") === 1) return ["ATO", "LO"];
       else if (getTradingSession("HOSE") === 2) return ["ATC", "LO"];
       else if (getTradingSession("HOSE") === 3) return ["MP", "LO"];
       break;
     case "HNX":
       if (getTradingSession("HNX") === -1 || getTradingSession("HNX") === 0)
-        return [];
+        return ["Không có lệnh phù hợp"];
       else if (getTradingSession("HNX") === 2) return ["ATC", "LO"];
       else if (getTradingSession("HNX") === 3)
         return ["MAK", "MOK", "MTL", "LO"];
@@ -17,12 +17,12 @@ export function getOrderTypes(exchange) {
       break;
     case "UPCOM":
       if (getTradingSession("UPCOM") === -1 || getTradingSession("UPCOM") === 0)
-        return [];
+        return ["Không có lệnh phù hợp"];
       else if (getTradingSession("UPCOM") === 3) return ["LO"];
       break;
 
     default:
-      return [];
+      return ["Không có lệnh phù hợp"];
       break;
   }
 }

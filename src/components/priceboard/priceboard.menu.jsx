@@ -7,6 +7,8 @@ import {
   genOtp,
   verifyOtp,
   changeExchange,
+  getDanhMuc,
+  getHistory,
 } from "../../redux/index";
 import { emitter } from "../../emitter";
 import OrderPopup from "../popup/order.popup";
@@ -14,6 +16,8 @@ import SkyLight from "react-skylight";
 import { getAll } from "../../services/userService";
 import HistoryPopup from "../popup/history.popup";
 import OtpPopup from "../popup/otp.popup";
+import DanhMuc from "../popup/danhMuc.popup";
+import { toast } from "react-toastify";
 
 const socket = socketIOClient(
   `http://localhost:${process.env.REACT_APP_IO_SERVER}`
@@ -24,6 +28,7 @@ class Menu extends Component {
     this.state = {
       exchange: "HOSE",
       order: {},
+      changePassword: {},
     };
   }
 
@@ -33,7 +38,11 @@ class Menu extends Component {
       emitter.emit("loadingStocks", true);
     });
     emitter.on(`verifySuccess`, () => {
+      this.otpPopup.hide();
       this.props.order(this.state.order);
+    });
+    emitter.on(`verifyFail`, (message) => {
+      toast.error(message);
     });
   };
 
@@ -69,15 +78,34 @@ class Menu extends Component {
     // this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
   };
 
+  clickHistory = () => {
+    if (this.props.user.token) {
+      this.props.getHistory(this.props.user.token);
+      this.historyPopup.show();
+    } else toast.info("Đăng nhập để thực hiện");
+  };
+
+  clickDanhMuc = () => {
+    if (this.props.user.token) {
+      this.props.getDanhMuc(this.props.user.token);
+      this.danhMucPopup.show();
+    } else toast.info("Đăng nhập để thực hiện");
+  };
+
   reSendOtp() {
     this.props.genOtp(this.props.user.token);
   }
+
+  getDanhMuc = () => {
+    this.props.getDanhMuc(this.props.user.token);
+  };
 
   componentWillUnmount() {}
 
   render() {
     let otpPopupStyle = {
-      backgroundColor: "rgb(33,32,39)",
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
       width: "30%",
       marginLeft: "-35%",
       left: "70%",
@@ -86,31 +114,35 @@ class Menu extends Component {
       width: "25%",
       minHeight: "400px",
       position: "fixed",
-      top: "35%",
+      top: "150px",
       left: "100%",
       height: "100%",
-      marginTop: "-200px",
       marginLeft: "-25%",
-      backgroundColor: "rgb(33,32,39)",
-      color: "white",
+      marginTop: 0,
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
       font: "roboto",
       fontSize: "1rem",
       padding: 0,
+      maxHeight: "calc(100% - 150px)",
+      overflowY: "auto",
     };
     let historyPopupStyle = {
       width: "25%",
       minHeight: "400px",
       position: "fixed",
-      top: "35%",
       left: "100%",
       height: "100%",
-      marginTop: "-200px",
+      top: "150px",
+      marginTop: "-0",
       marginLeft: "-25%",
-      backgroundColor: "rgb(33,32,39)",
-      color: "white",
       font: "roboto",
       fontSize: "1rem",
       padding: 0,
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
+      maxHeight: "calc(100% - 150px)",
+      overflowY: "auto",
     };
     const exchange =
       localStorage.getItem("activeExchange") || this.state.exchange;
@@ -139,23 +171,21 @@ class Menu extends Component {
         >
           UPCOM
         </button>
-        <button
-          className="btn-menu order"
-          onClick={() => this.historyPopup.show()}
-        >
+
+        <button className="btn-menu order" onClick={this.clickHistory}>
           Lịch sử GD
           {/* <i className="fas fa-book"></i> */}
         </button>
-        <button
-          className="btn-menu order"
-          onClick={() => this.historyPopup.show()}
-        >
+        <button className="btn-menu order" onClick={this.clickDanhMuc}>
           Danh mục
           {/* <i className="fas fa-book"></i> */}
         </button>
         <button
           className="btn-menu order"
-          onClick={() => this.orderPopup.show()}
+          onClick={() => {
+            if (this.props.user.token) this.orderPopup.show();
+            else toast.info("Đăng nhập để thực hiện");
+          }}
         >
           Đặt lệnh
           {/* <i className="fas fa-plus"></i> */}
@@ -169,12 +199,29 @@ class Menu extends Component {
           <OrderPopup callback={this.checkOtpCode} />
         </SkyLight>
         <SkyLight
+          dialogStyles={orderPopupStyle}
+          hideOnOverlayClicked
+          ref={(ref) => (this.danhMucPopup = ref)}
+          title="Danh mục"
+        >
+          <DanhMuc
+            getDanhMuc={this.getDanhMuc}
+            danhMuc={
+              this.props.user
+                ? this.props.user.danhMuc
+                  ? this.props.user.danhMuc
+                  : []
+                : []
+            }
+          />
+        </SkyLight>
+        <SkyLight
           dialogStyles={historyPopupStyle}
           hideOnOverlayClicked
           ref={(ref) => (this.historyPopup = ref)}
-          title="Sổ lệnh"
+          title="Lịch sử giao dịch"
         >
-          <HistoryPopup />
+          <HistoryPopup history={this.props.history} />
         </SkyLight>
         <SkyLight
           dialogStyles={otpPopupStyle}
@@ -193,10 +240,11 @@ class Menu extends Component {
   }
 }
 
-const mapStateToProps = ({ stocks, user, otp }) => ({
+const mapStateToProps = ({ stocks, user, otp, history }) => ({
   stocks: stocks,
   user: user,
   otp: otp,
+  history: history,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -207,6 +255,8 @@ const mapDispatchToProps = (dispatch) => ({
   genOtp: (payload) => dispatch(genOtp(payload)),
   verifyOtp: (payload) => dispatch(verifyOtp(payload)),
   changeExchange: (exchange) => dispatch(changeExchange(exchange)),
+  getDanhMuc: (payload) => dispatch(getDanhMuc(payload)),
+  getHistory: (payload) => dispatch(getHistory(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu);

@@ -74,6 +74,38 @@ function sendMailOtpCode(sendTo, otpCode, response) {
   });
 }
 
+function sendMailConfirm(sendTo, url, response) {
+  var transporter = nodemailer.createTransport(
+    smtpTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      auth: {
+        user: process.env.GMAIL_EMAIL,
+        pass: process.env.GMAIL_SECRET,
+      },
+    })
+  );
+  console.log(process.env.GMAIL_EMAIL)
+  console.log(process.env.GMAIL_SECRET)
+  var mailOptions = {
+    from: "misecurities@gmail.com",
+    to: sendTo,
+    subject: "MISECURITIES",
+    text: `Click vào link để xác nhận:\n${url}`,
+  };
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+      transporter.close();
+    } else {
+      console.log("Email sent: " + info.response);
+      transporter.close();
+    }
+  });
+}
+
 module.exports = {
   sendMailOtpCode: sendMailOtpCode,
+  sendMailConfirm: sendMailConfirm,
 };

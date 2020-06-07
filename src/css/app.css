@@ -1,6 +1,7 @@
 body {
   height: 100vh;
-  background-color: #222;
+  background-color: rgb(255, 255, 255);
+  color: rgb(21, 27, 30);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -18,35 +19,39 @@ body {
 }
 
 .red {
-  color: #ea0713;
+  color: rgb(255, 0, 23);
 }
 
 .green {
-  color: #06f506;
+  color: rgb(0, 124, 1);
 }
 
 .blue {
-  color: #3abbff;
+  color: rgb(0, 105, 196);
 }
 
 .yellow {
-  color: #c5f100;
+  color: rgb(246, 155, 11);
 }
 
 .purple {
-  color: #e200da;
+  color: rgb(190, 0, 190);
 }
 
 .white {
   color: white;
 }
 
+.black {
+  color: rgb(21, 27, 30);
+}
+
 .color1 {
-  background-color: #1d1c1c;
+  background-color: rgb(244, 245, 249);
 }
 
 .color2 {
-  background-color: #282828;
+  background-color: rgb(230, 232, 237);
 }
 
 .skylight-dialog h2 {
@@ -55,7 +60,7 @@ body {
   padding-top: 15px;
 }
 .Toastify__progress-bar--animated {
-  animation-duration: 1500ms!important;
+  animation-duration: 1500ms !important;
   animation-play-state: running;
   opacity: 0;
 }
@@ -68,27 +73,49 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
 .content-center td {
-  text-align: center!important;
+  text-align: center !important;
+}
+
+::-webkit-input-placeholder {
+  /* WebKit browsers */
+  text-transform: none;
+}
+:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  text-transform: none;
+}
+::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  text-transform: none;
+}
+:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+  text-transform: none;
+}
+::placeholder {
+  /* Recent browsers */
+  text-transform: none;
+}
+
+.reactDatez input{
+  height: 41px;
+  background: #f2f2f2;
+  box-shadow: none !important;
+  border: none;
+  width: 100%;
 }
 
 
-::-webkit-input-placeholder { /* WebKit browsers */
-  text-transform: none;
+::-webkit-scrollbar {
+  width: 0px;
 }
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-  text-transform: none;
-}
-::-moz-placeholder { /* Mozilla Firefox 19+ */
-  text-transform: none;
-}
-:-ms-input-placeholder { /* Internet Explorer 10+ */
-  text-transform: none;
-}
-::placeholder { /* Recent browsers */
-  text-transform: none;
+
+.table--left td,.table--left td th {
+  text-align: left!important;
+  padding-left: 10px;
 }

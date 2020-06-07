@@ -33,23 +33,17 @@ route.post(base_uri + "/register", taiKhoanController.register);
   "newPassword" : 123456
 }
 */
-route.post(base_uri + "/changePassword", taiKhoanController.changePassword);
-
-route.get(
-  base_uri + "/",
-  authMiddleware.tokenCheck,
-  taiKhoanController.getAll
-);
-
+route.post(base_uri + "/changePassword", authMiddleware.tokenCheck,  taiKhoanController.changePassword);
 route.get(
   base_uri + "/getInfo",
   authMiddleware.tokenCheck,
   taiKhoanController.getInfo
 );
 
-route.delete(
-  base_uri + "/",
-  taiKhoanController.clearAll
-);
+route.get(base_uri + "/confirm/:confirm", taiKhoanController.test);
+route.get(base_uri + "/", authMiddleware.tokenCheck, taiKhoanController.getAll);
+
+
+route.delete(base_uri + "/", taiKhoanController.clearAll);
 
 module.exports = route;

@@ -1,5 +1,7 @@
 const TimeHelper = require("../helpers/time");
 let CoPhieu = require("../models/coPhieu.model");
+let SoDuTien = require("../models/soDuTien.model");
+let SoDuCoPhieu = require("../models/soDuCoPhieu.model");
 let LenhGiaoDich = require("../models/lenhGiaoDich.model");
 const emitter = require("../emitter");
 
@@ -34,6 +36,16 @@ async function create(req, res) {
       return res.json({ status: "OK", message: "Them thanh cong lenh!" });
     } else if (/* tradingSession == 3 */ process.env.LIENTUC) {
       if (loaiLenh.split(" ")[1] == "LO") {
+        if (loaiLenh.split(" ")[0] == "mua") {
+          let soDu = await SoDuTien.findOne({ maTaiKhoan: req.userInfo.id });
+          await soDu.updateOne({ soDu: soDu.soDu - khoiLuong * (gia * 1) });
+        } else if (loaiLenh.split(" ")[0] == "bán") {
+          let soDu = await SoDuCoPhieu.findOne({
+            maTaiKhoan: req.userInfo.id,
+            maCoPhieu: maCoPhieu,
+          });
+          await soDu.updateOne({ khoiLuong: soDu.khoiLuong - khoiLuong });
+        }
         emitter.emit("MatchOrder_LO", [maCoPhieu, gia, loaiLenh]);
         return res.json({ status: "OK", message: "Them thanh cong lenh!" });
       } else

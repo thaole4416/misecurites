@@ -39,18 +39,18 @@ export function* getHistorySaga(action) {
     if (result.status == "OK") {
       yield put({
         type: "LICH_SU_SUCCESS",
-        payload: result,
+        payload: result.data,
       });
     } else if (result.status == "FAIL") {
       yield put({
         type: "LICH_SU_SUCCESS",
-        payload: { data: {} },
+        payload:  [] ,
       });
     }
   } catch (err) {
     yield put({
       type: "LICH_SU_SUCCESS",
-      payload: { data: { err: err } },
+      payload:   { err: err } ,
     });
   }
 }

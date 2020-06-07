@@ -55,7 +55,10 @@ class TRow extends Component {
   }
 
   checkColor(a, b) {
-    const { ceiling, floor } = this.props.stock_data;
+    let { ceiling, floor } = this.props.stock_data;
+    if (b == "ATC" || b == "ATO") return "";
+    else if (b == "") return "";
+    else b = b * 1;
     if (b < a && b !== 0 && b > floor) {
       return "red";
     }
@@ -182,7 +185,7 @@ class TRow extends Component {
       symbol && (
         <tr className="stock-row highlight">
           <td
-            onClick={this.props.click}
+            onClick={() => this.props.click(symbol)}
             // onClick={() => this.handleClick(symbol)}
             className={`${this.checkColor(reference, match)} rs-colum`}
             style={{
@@ -207,10 +210,10 @@ class TRow extends Component {
           <td className={`yellow td ${color}`} style={{ width: "3%" }}>
             <span>{this.checkEmpty(reference)}</span>
           </td>
-          <td className={`white td`} style={{ width: "5%" }}>
+          <td className={`black td`} style={{ width: "5%" }}>
             <span>{this.checkKL(totalVol)}</span>
           </td>
-          <td className={`white td`} style={{ width: "5%" }}>
+          <td className={`black td`} style={{ width: "5%" }}>
             <span>{this.checkEmpty(totalVal, true)}</span>
           </td>
           <HighlightRow

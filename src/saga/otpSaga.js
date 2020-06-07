@@ -35,6 +35,7 @@ export function* verifyOtpSaga(action) {
         payload: result,
       });
     } else if (result.status == "FAIL") {
+      emitter.emit("verifyFail",result.message);
       yield put({
         type: "VERIFY_OTP_SUCCESS",
         payload: result,

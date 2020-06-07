@@ -5,19 +5,30 @@ import user from "./userReducer";
 import otp from "./otpReducer";
 import allStocks from "./allStocksReducer";
 import exchange from "./exchangeReducer";
+import history from "./historyReducer";
 import createSagaMiddleware from "redux-saga";
 import rootSaga from "../saga";
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
-  combineReducers({ stocks, orders, user, allStocks, otp,exchange}),
+  combineReducers({ stocks, orders, user, allStocks, otp, exchange, history }),
   applyMiddleware(sagaMiddleware)
 );
 sagaMiddleware.run(rootSaga);
 
 export default store;
-export { setStocks, changeStocks , getHistory } from "./stocksReducer";
+export { setStocks, changeStocks } from "./stocksReducer";
 export { getAllStocks } from "./allStocksReducer";
-export { login, loginSuccess, loginFail, logout , getDanhMuc ,getThongTin } from "./userReducer";
+export {
+  login,
+  loginSuccess,
+  loginFail,
+  logout,
+  getDanhMuc,
+  getThongTin,
+  register,
+  changePassword,
+} from "./userReducer";
 export { order, orderSuccess } from "./ordersReducer";
 export { genOtp, verifyOtp } from "./otpReducer";
 export { changeExchange } from "./exchangeReducer";
+export { getHistory } from "./historyReducer";

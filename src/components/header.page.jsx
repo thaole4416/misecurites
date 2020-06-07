@@ -4,12 +4,24 @@ import RegisterPopup from "./popup/register.popup";
 import InfoPopup from "./popup/info.popup";
 import ChangePasswordPopup from "./popup/passwordChange.popup";
 import SkyLight from "react-skylight";
-import { login, logout, getAllStocks,getThongTin,getDanhMuc } from "../redux";
+import {
+  login,
+  logout,
+  getAllStocks,
+  getThongTin,
+  getDanhMuc,
+  register,
+  verifyOtp,
+  genOtp,
+  changePassword,
+} from "../redux";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import logo from "../img/logo.png";
 import Clock from "./clock";
 import { getCookie } from "../helpers/cookies";
+import { emitter } from "../emitter";
+import OtpPopup from "./popup/otp.popup";
 
 class Header extends Component {
   constructor(props) {
@@ -17,6 +29,8 @@ class Header extends Component {
 
     this.state = {
       showUserMenu: false,
+      registerErrors: [],
+      password: {}
     };
   }
 
@@ -25,10 +39,41 @@ class Header extends Component {
     this.registerPopup.show();
   };
 
+  listenEvent = () => {
+    emitter.on("loginSuccess", () =>{
+       toast.success("Đăng nhập thành công")
+       this.props.getThongTin(this.props.user.token);
+       this.props.getDanhMuc(this.props.user.token);
+      });
+    emitter.on("loginFail", () => toast.error("Đăng nhập thất bại"));
+    emitter.on("registerSuccess", () => {
+      this.registerPopup.hide();
+      toast.success("Đăng ký thành công");
+    });
+    emitter.on("registerFail", (errors) => {
+      this.setState({ registerErrors: errors });
+      toast.error("Đăng ký thất bại");
+    });
+    emitter.on(`verifySuccess1`, () => {
+      this.props.changePassword({token: this.props.user.token, password: this.state.password.password, newPassword: this.state.password.newPassword});
+    });
+    emitter.on(`changePasswordSuccess`, () => {
+      toast.success("Đổi mật khẩu thành công")
+    });
+    emitter.on(`changePasswordFail`, (message) => {
+      toast.error(message)
+    });
+  };
+
   submitLogin = (loginPostData, e) => {
     e.preventDefault();
     this.props.login(loginPostData);
-    toast.success("Đăng nhập thành công");
+    this.loginPopup.hide();
+  };
+
+  submitRegister = (loginPostData, e) => {
+    e.preventDefault();
+    this.props.register(loginPostData);
     this.loginPopup.hide();
   };
 
@@ -37,10 +82,12 @@ class Header extends Component {
   };
 
   handleShowInfo = () => {
+    this.setState({ showUserMenu: !this.state.showUserMenu });
     this.infoPopup.show();
   };
 
   handleShowChangePassword = () => {
+    this.setState({ showUserMenu: !this.state.showUserMenu });
     this.changePasswordPopup.show();
   };
 
@@ -54,23 +101,48 @@ class Header extends Component {
     toast.success("Đăng xuất thành công");
   };
 
+  verifyOtp = (otpCode, event) => {
+    event.preventDefault();
+    emitter.emit(`verifySuccess1`);
+    // this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
+  };
+
   componentDidMount() {
+    this.listenEvent();
     this.props.getAllStocks();
-    if(this.props.user || getCookie("userInfo")){
+    if (this.props.user || getCookie("userInfo")) {
       this.props.getThongTin(this.props.user.token);
       this.props.getDanhMuc(this.props.user.token);
     }
   }
 
+  checkOtpCode = (password) => {
+    this.otpPopup1.show();
+    // this.props.genOtp(this.props.user.token);
+    this.setState({ password });
+  };
+
   render() {
     let loginPopupStyle = {
-      backgroundColor: "rgb(33,32,39)",
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
+      width: "30%",
+      marginLeft: "-35%",
+      left: "70%",
+      minHeight: "300px",
+    };
+    let otpPopup1Style = {
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
       width: "30%",
       marginLeft: "-35%",
       left: "70%",
     };
     let registerPopupStyle = {
-      backgroundColor: "rgb(33,32,39)",
+      maxHeight: "500px",
+      overflowY: "auto",
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
       width: "70%",
       marginLeft: "-15%",
       left: "30%",
@@ -79,13 +151,13 @@ class Header extends Component {
       width: "25%",
       minHeight: "400px",
       position: "fixed",
-      top: "35%",
+      top: "150px",
+      marginTop: "-0",
       left: "100%",
       height: "100%",
-      marginTop: "-200px",
       marginLeft: "-25%",
-      backgroundColor: "rgb(33,32,39)",
-      color: "white",
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
       font: "roboto",
       fontSize: "1rem",
       padding: 0,
@@ -94,13 +166,13 @@ class Header extends Component {
       width: "25%",
       minHeight: "400px",
       position: "fixed",
-      top: "35%",
+      top: "150px",
+      marginTop: "-0",
       left: "100%",
       height: "100%",
-      marginTop: "-200px",
       marginLeft: "-25%",
-      backgroundColor: "rgb(33,32,39)",
-      color: "white",
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
       font: "roboto",
       fontSize: "1rem",
       padding: 0,
@@ -116,7 +188,12 @@ class Header extends Component {
         <div className="login div">
           {user && user.username ? (
             <div>
-              <span>{user.username} &nbsp;&nbsp;&nbsp;</span>
+              <span
+                onClick={this.handleShowUserMenu}
+                style={{ cursor: "pointer" }}
+              >
+                {user.username} &nbsp;&nbsp;&nbsp;
+              </span>
               <div className="userMenu">
                 <a
                   href="javascript:void(0);"
@@ -177,14 +254,28 @@ class Header extends Component {
         >
           <LoginPopup register={this.register} submit={this.submitLogin} />
         </SkyLight>
-
+        <SkyLight
+          dialogStyles={otpPopup1Style}
+          hideOnOverlayClicked
+          ref={(ref) => (this.otpPopup1 = ref)}
+          title="Check mã OTP"
+        >
+          <OtpPopup
+            verifyOtp={this.verifyOtp}
+            reSendOtp={this.reSendOtp}
+            otp={this.props.otp}
+          />
+        </SkyLight>
         <SkyLight
           dialogStyles={registerPopupStyle}
           hideOnOverlayClicked
           ref={(ref) => (this.registerPopup = ref)}
           title="Đăng ký tài khoản"
         >
-          <RegisterPopup />
+          <RegisterPopup
+            submit={this.submitRegister}
+            errors={this.state.registerErrors}
+          />
         </SkyLight>
 
         <SkyLight
@@ -193,7 +284,7 @@ class Header extends Component {
           ref={(ref) => (this.changePasswordPopup = ref)}
           title="Đổi mật khẩu"
         >
-          <ChangePasswordPopup />
+          <ChangePasswordPopup callback={this.checkOtpCode} />
         </SkyLight>
         <SkyLight
           dialogStyles={infoPopuppStyle}
@@ -201,19 +292,23 @@ class Header extends Component {
           ref={(ref) => (this.infoPopup = ref)}
           title="Thông tin tài khoản"
         >
-          <InfoPopup />
+          <InfoPopup info={this.props.user.info} />
         </SkyLight>
       </div>
     );
   }
 }
 
-const mapStateToProps = ({ user }) => ({
+const mapStateToProps = ({ user, otp }) => ({
   user: user,
+  otp: otp,
 });
 const mapDispatchToProps = (dispatch) => ({
   login: (postData) => {
     dispatch(login(postData));
+  },
+  register: (postData) => {
+    dispatch(register(postData));
   },
   logout: () => {
     dispatch(logout());
@@ -227,6 +322,9 @@ const mapDispatchToProps = (dispatch) => ({
   getDanhMuc: (payload) => {
     dispatch(getDanhMuc(payload));
   },
+  genOtp: (payload) => dispatch(genOtp(payload)),
+  verifyOtp: (payload) => dispatch(verifyOtp(payload)),
+  changePassword: (payload) => dispatch(changePassword(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

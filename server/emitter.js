@@ -1,6 +1,6 @@
 var EventEmitter = require("events");
 var emitter = new EventEmitter();
-
+emitter.setMaxListeners(0);
 const TimeHelper = require("./helpers/time");
 const RandomHelper = require("./helpers/random");
 const CoPhieu = require("./models/coPhieu.model");
@@ -14,7 +14,7 @@ const orderType = Object.freeze({
 });
 
 emitter.on("initData", () => {
-  let time = { hour: 20, minute: 46, second: 0, milisecond: 0 };
+  let time = { hour: 21, minute: 43, second: 0, milisecond: 0 };
   TimeHelper.excuteCodeAtTime(async function () {
     for (let i = 0; i < 200; i++) {
       await _initOrder(orderType.buy + " LO", 1);
@@ -35,7 +35,7 @@ emitter.on("MatchOrder_LO", async (params) => {
     loaiLenh: orderType.sell + " LO",
     khoiLuongConLai: { $ne: 0 },
     trangThai: { $ne: "đã khớp" },
-  }).sort({ gia: 1, createdTime: 1 });
+  }).sort({ gia: 1, createdTime: 1, khoiLuong: 1 });
   const lenhMuas = await LenhGiaoDich.find({
     maCoPhieu: stockId,
     gia: { $gte: gia },
@@ -43,39 +43,41 @@ emitter.on("MatchOrder_LO", async (params) => {
     loaiLenh: orderType.buy + " LO",
     khoiLuongConLai: { $ne: 0 },
     trangThai: { $ne: "đã khớp" },
-  }).sort({ gia: -1, createdTime: 1 });
+  }).sort({ gia: -1, createdTime: 1, khoiLuong: 1 });
   if (type.split(" ")[0] == orderType.buy) {
     if (!lenhMuas[0]) return;
     let lenhMua = lenhMuas[0];
     for (let lenhBan of lenhBans) {
       // if (lenhBan.gia === lenhMua.gia /*&& lenhBan_id != maLenhMua*/) {
-      if (lenhMua.khoiLuong > 0) {
-        if (lenhMua.khoiLuong >= lenhBan.khoiLuong) {
+      if (lenhMua.khoiLuongConLai > 0) {
+        if (lenhMua.khoiLuongConLai >= lenhBan.khoiLuongConLai) {
           _saveGiaoDichKhop(
             stockId,
             lenhMua,
             lenhBan,
-            lenhBan.khoiLuong,
+            lenhBan.khoiLuongConLai,
             lenhMua.gia
           );
-          let luongMuaConLai = lenhMua.khoiLuong - lenhBan.khoiLuong;
+          let luongMuaConLai =
+            lenhMua.khoiLuongConLai - lenhBan.khoikhoiLuongConLaiLuong;
           lenhMua.khoiLuong = luongMuaConLai;
           _capNhatLaiLenh(lenhMua, lenhBan, luongMuaConLai, 0);
-        } else if (lenhMua.khoiLuong < lenhBan.khoiLuong) {
+        } else if (lenhMua.khoiLuongConLai < lenhBan.khoiLuongConLai) {
           _saveGiaoDichKhop(
             stockId,
             lenhMua,
             lenhBan,
             lenhBan.khoiLuong,
-            lenhMua.gia
+            lenhMua.khoiLuongConLai
           );
-          let luongBanConLai = lenhBan.khoiLuong - lenhMua.khoiLuong;
+          let luongBanConLai =
+            lenhBan.khoiLuongConLai - lenhMua.khoiLuongConLai;
           _capNhatLaiLenh(lenhMua, lenhBan, 0, luongBanConLai);
           break;
         }
       } else {
         LenhGiaoDich.findByIdAndUpdate(lenhMua._id, {
-          khoiLuong: 0,
+          khoiLuongConLai: 0,
           trangThai: "đã khớp",
         }).catch((err) => console.log(err));
         break;
@@ -86,33 +88,35 @@ emitter.on("MatchOrder_LO", async (params) => {
     if (!lenhBans[0]) return;
     let lenhBan = lenhBans[0];
     for (let lenhMua of lenhMuas) {
-      if (lenhBan.khoiLuong > 0) {
-        if (lenhBan.khoiLuong >= lenhMua.khoiLuong) {
+      if (lenhBan.khoiLuongConLai > 0) {
+        if (lenhBan.khoiLuongConLai >= lenhMua.khoiLuongConLai) {
           await _saveGiaoDichKhop(
             stockId,
             lenhMua,
             lenhBan,
-            lenhMua.khoiLuong,
+            lenhMua.khoiLuongConLai,
             lenhBan.gia
           );
-          let luongBanConLai = lenhBan.khoiLuong - lenhMua.khoiLuong;
+          let luongBanConLai =
+            lenhBan.khoiLuongConLai - lenhMua.khoiLuongConLai;
           lenhBan.khoiLuong = luongBanConLai;
           await _capNhatLaiLenh(lenhMua, lenhBan, 0, luongBanConLai);
-        } else if (lenhBan.khoiLuong < lenhMua.khoiLuong) {
+        } else if (lenhBan.khoiLuongConLai < lenhMua.khoiLuongConLai) {
           await _saveGiaoDichKhop(
             stockId,
             lenhMua,
             lenhBan,
-            lenhBan.khoiLuong,
+            lenhBan.khoiLuongConLai,
             lenhBan.gia
           );
-          let luongMuaConLai = lenhMua.khoiLuong - lenhBan.khoiLuong;
+          let luongMuaConLai =
+            lenhMua.khoiLuongConLai - lenhBan.khoiLuongConLai;
           await _capNhatLaiLenh(lenhMua, lenhBan, luongMuaConLai, 0);
           break;
         }
       } else {
         await LenhGiaoDich.findByIdAndUpdate(lenhBan._id, {
-          khoiLuong: 0,
+          khoiLuongConLai: 0,
           trangThai: "đã khớp",
         }).catch((err) => console.log(err));
         break;
@@ -121,16 +125,15 @@ emitter.on("MatchOrder_LO", async (params) => {
   }
   emitter.emit("getExchangeData");
 });
-
 emitter.on("MatchOrder_MPX", async (param) => {
   const { lenhGiaoDich, res } = param;
   if (lenhGiaoDich.loaiLenh.split(" ")[0] === "mua") {
     let lenhBans = await LenhGiaoDich.find({
       loaiLenh: "bán LO",
-      trangThai: { $ne: { $in: ["đã hủy, khớp hoàn toàn"] } },
+      trangThai: { $nin: ["đã hủy, khớp hoàn toàn"] },
       khoiLuongConLai: { $ne: 0 },
       createdDay: TimeHelper.getToday(),
-    }).sort({ gia: 1, createdTime: -1 });
+    }).sort({ gia: 1, createdTime: -1, khoiLuong: 1 });
     if (lenhBans.length === 0) {
       await LenhGiaoDich.updateOne(
         { _id: lenhGiaoDich._id },
@@ -270,10 +273,10 @@ emitter.on("MatchOrder_MPX", async (param) => {
   } else if (lenhGiaoDich.loaiLenh.split(" ")[0] === "bán") {
     let lenhMuas = await LenhGiaoDich.find({
       loaiLenh: "mua LO",
-      trangThai: { $ne: { $in: ["đã hủy, khớp hoàn toàn"] } },
+      trangThai: { $nin: ["đã hủy", "khớp hoàn toàn"] },
       khoiLuongConLai: { $ne: 0 },
       createdDay: TimeHelper.getToday(),
-    }).sort({ gia: -1, createdTime: -1 });
+    }).sort({ gia: -1, createdTime: -1, khoiLuong: 1 });
     if (lenhMuas.length === 0) {
       await LenhGiaoDich.updateOne(
         { _id: lenhGiaoDich._id },
@@ -583,8 +586,56 @@ let _getStockData = async function () {
       },
       { $sort: { gia: 1 } },
     ]);
-    let tongKhopAll = [];
-    let top1KhopAll = [];
+    let top1KhopAll = await GiaoDichKhop.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+        },
+      },
+      {
+        $group: {
+          _id: { gia: "$gia", maCoPhieu: "$maCoPhieu" },
+          tongKhoiLuong: { $sum: "$khoiLuong" },
+        },
+      },
+      {
+        $match: {
+          tongKhoiLuong: { $ne: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          gia: "$_id.gia",
+          maCoPhieu: "$_id.maCoPhieu",
+          tongKhoiLuong: 1,
+        },
+      },
+      { $sort: { matchedTime: 1 } },
+    ]);
+    let tongKhopAll = await GiaoDichKhop.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+        },
+      },
+      {
+        $group: {
+          _id: { createdDay: "$createdDay", maCoPhieu: "$maCoPhieu" },
+          tongKL: { $sum: "$khoiLuong" },
+          tongGT: { $sum: { $multiply: ["$khoiLuong", "$gia"] } },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          maCoPhieu: "$_id.maCoPhieu",
+          tongKL: 1,
+          tongGT: 1,
+        },
+      },
+      { $match: { tongKL: { $ne: 0 }, tongGT: { $ne: 0 } } },
+    ]);
     for (let coPhieu of coPhieuAll) {
       let stockData = {};
       let stockId = coPhieu._id;
@@ -644,7 +695,6 @@ let _getStockData = async function () {
         stockData.sVol_2 = top3Ban[0] ? top3Ban[0].tongKhoiLuong : "";
         stockData.sVol_3 = top3Ban[1] ? top3Ban[1].tongKhoiLuong : "";
       }
-
       let top1Khop = top1KhopAll
         .filter((x) => x.maCoPhieu == stockId)
         .slice(0, 1);
@@ -732,7 +782,7 @@ let _getStockData = async function () {
       {
         $group: {
           _id: { gia: "$gia", maCoPhieu: "$maCoPhieu" },
-          tongKhoiLuong: { $sum: "$khoiLuongConLai" },
+          tongKhoiLuong: { $sum: "$khoiLuong" },
         },
       },
       {
@@ -759,7 +809,7 @@ let _getStockData = async function () {
       {
         $group: {
           _id: { createdDay: "$createdDay", maCoPhieu: "$maCoPhieu" },
-          tongKL: { $sum: "$khoiLuongConLai" },
+          tongKL: { $sum: "$khoiLuong" },
           tongGT: { $sum: { $multiply: ["$khoiLuong", "$gia"] } },
         },
       },

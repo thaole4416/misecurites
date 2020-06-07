@@ -45,6 +45,7 @@ async function _createTaiKhoan() {
         diaChi: "Hà Nội",
         soDienThoai: "0977098873",
         email: "thanhpd@gmail.com",
+        isConfirm: "true"
       },
       {
         _id: "29A000002",
@@ -58,6 +59,7 @@ async function _createTaiKhoan() {
         diaChi: "Hà Nội",
         soDienThoai: "0977098873",
         email: "luanct@gmail.com",
+        isConfirm: "true"
       },
       {
         _id: "29A000003",
@@ -71,6 +73,7 @@ async function _createTaiKhoan() {
         diaChi: "Hà Nội",
         soDienThoai: "0977098873",
         email: "admin@gmail.com",
+        isConfirm: "true"
       },
     ];
     await TaiKhoan.collection.insertMany(data);
@@ -88,7 +91,6 @@ async function _createTaiKhoan() {
 async function _createGiaoDich() {
   let result = await LenhGiaoDich.find({ createdDay: TimeHelper.getToday() });
   if (!result.length) {
-    emitter.emit("initData");
     console.log("Khởi tạo dữ liệu giao dịch thành công");
   } else {
     console.log("Đã có dữ liệu giao dịch");

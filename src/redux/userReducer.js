@@ -9,10 +9,17 @@ const actionTypes = {
   THONG_TIN: "THONG_TIN",
   THONG_TIN_SUCCESS: "THONG_TIN_SUCCESS",
   LOGOUT: "LOGOUT",
+  REGISTER: "REGISTER",
+  CHANGE_PASSWORD: "CHANGE_PASSWORD",
+  CHANGE_PASSWORD_SUCCESS: "CHANGE_PASSWORD_SUCCESS",
 };
 
 export const login = (data) => ({
   type: actionTypes.LOGIN,
+  payload: data,
+});
+export const register = (data) => ({
+  type: actionTypes.REGISTER,
   payload: data,
 });
 
@@ -49,6 +56,15 @@ export const getThongTinSuccess = (payload) => ({
   type: actionTypes.THONG_TIN_SUCCESS,
   payload: payload,
 });
+export const changePassword = (payload) => ({
+  type: actionTypes.CHANGE_PASSWORD,
+  payload: payload,
+});
+
+export const changePasswordSuccess = (payload) => ({
+  type: actionTypes.CHANGE_PASSWORD_SUCCESS,
+  payload: payload,
+});
 
 const initialState = getCookie("userInfo") || {
   username: "",
@@ -56,6 +72,7 @@ const initialState = getCookie("userInfo") || {
   message: "",
   token: "",
   refreshToken: "",
+  danhMuc: [],
 };
 
 const user = (state, action) => {
@@ -71,15 +88,26 @@ const user = (state, action) => {
       setCookie("userInfo", state, 60 * 60);
       return { ...state };
     case actionTypes.DANH_MUC_SUCCESS:
-      return { ...state, danhMuc: action.payload.data  };
+      return { ...state, danhMuc: action.payload.data };
     case actionTypes.THONG_TIN_SUCCESS:
-      return { ...state, info: action.payload.data, soDu: action.payload.data.soDu};
+      return {
+        ...state,
+        info: action.payload.data,
+        soDu: action.payload.data.soDu,
+      };
     case actionTypes.LOGIN_FAIL:
       state = { ...state, username: "", id: "", message: action.payload };
       return { ...state };
     case actionTypes.LOGOUT:
       deleteCookie("userInfo");
-      return { ...initialState };
+      return {
+        username: "",
+        id: "",
+        message: "",
+        token: "",
+        refreshToken: "",
+        danhMuc: [],
+      };
     default:
       return state || initialState;
   }

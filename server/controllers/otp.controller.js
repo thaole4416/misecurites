@@ -14,7 +14,6 @@ function genOtp(req, res) {
     otpCode: otpCode,
     createdTime: Date.now(),
   });
-  console.log(otpCode)
   genOtp.save();
   mailHelper.sendMailOtpCode("ledinhthao131098@gmail.com", otpCode, res);
 }

@@ -18,7 +18,7 @@ require("./database");
 require("./helpers/MatchOrder");
 
 app.use("/api", routes);
-
+emitter.emit("initData");
 io.on("connection", function (socket) {
   socket.on("initData", () => {
     emitter.emit("initData");

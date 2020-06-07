@@ -4,14 +4,17 @@ import { connect } from "react-redux";
 import { changeStocks } from "../../redux/index";
 import { emitter } from "../../emitter";
 import Scrollbar from "../scrollbar";
+
+import DetailPopup from "../popup/detail.popup";
+import SkyLight from "react-skylight";
 class Tbody extends Component {
   constructor(props) {
     super(props);
-    this.listenEvent();
     this.state = {
       data: null,
       isLoadEnd: false,
       isCheckHighLight: false,
+      symbol: "",
     };
   }
 
@@ -27,18 +30,34 @@ class Tbody extends Component {
   };
 
   componentDidMount() {
+    this.listenEvent();
     this.setState({ data: this.props.stocks });
   }
 
   componentWillUnmount() {}
 
-  click = () => {
-    console.log("click");
-    this.props.changeStocks();
+  click = (symbol) => {
+    this.setState({ symbol: symbol });
+    this.detailPopup.show();
   };
 
   render() {
     let index = 0;
+    let detailPopuppStyle = {
+      width: "25%",
+      minHeight: "400px",
+      position: "fixed",
+      top: "150px",
+      marginTop: "-0",
+      left: "100%",
+      height: "100%",
+      marginLeft: "-25%",
+      backgroundColor: "rgb(255, 255, 255)",
+      boxShadow: "rgba(0, 0, 0, 0.4) 0px -4px 10px",
+      font: "roboto",
+      fontSize: "1rem",
+      padding: 0,
+    };
     return (
       <div
         style={{
@@ -72,14 +91,24 @@ class Tbody extends Component {
             </tbody>
           </table>
         </Scrollbar>
+        <SkyLight
+          dialogStyles={detailPopuppStyle}
+          hideOnOverlayClicked
+          ref={(ref) => (this.detailPopup = ref)}
+          title={`Chi tiết mã ${this.state.symbol}`}
+        >
+          <DetailPopup click={this.props.user.info} />
+        </SkyLight>
       </div>
     );
   }
 }
 
-const mapStateToProps = ({ stocks, exchange }) => ({
+const mapStateToProps = ({ stocks, exchange, user, otp }) => ({
   stocks: stocks,
   exchange: exchange,
+  user: user,
+  otp: otp,
 });
 
 const mapDispatchToProps = (dispatch) => ({

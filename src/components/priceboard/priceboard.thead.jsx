@@ -15,7 +15,7 @@ class Thead extends React.Component {
 
     return (
       <table className='table-top' style={{ border: '1px solid #eee' }} >
-        <thead style={{ color: 'white', fontWeight: '100' }}>
+        <thead style={{fontWeight: '100' }}>
           <tr>
             <th className={`th`} rowSpan='2' style={{ width: '5%' }}>Mã CP</th>
             {/* hidden */}

@@ -15,7 +15,8 @@ const taiKhoanSchema = new Schema(
     diaChi: { type: String, required: true },
     soDienThoai: { type: Number, required: true },
     email: { type: String, required: true },
-    createdTime: {type: String, required: true}
+    createdTime: {type: String, required: true},
+    isConfirm: {type: String, required: false}
   },
   { collection: 'TaiKhoan'}
 );

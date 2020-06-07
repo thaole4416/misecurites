@@ -23,17 +23,17 @@ const tokenCheck = async (req, res, next) => {
       next();
     } catch (err) {
       if (err.name === "TokenExpiredError") {
-        return res.status(401).json({
+        return res.status(401).json({status: "FAIL",
           message: "Token expired.",
         });
       }
       console.error(err.name);
-      return res.status(401).json({
+      return res.status(401).json({status: "FAIL",
         message: "Unauthorized access.",
       });
     }
   } else {
-    return res.status(403).send({
+    return res.status(403).send({status: "FAIL",
       message: "No token provided.",
     });
   }
@@ -44,7 +44,7 @@ const requireAuth = async (req, res, next) => {
   if (taiKhoan) {
     next();
   } else {
-    res.json({ message: "Đăng nhập để thực hiện" });
+    res.json({status: "FAIL", message: "Đăng nhập để thực hiện" });
   }
 };
 

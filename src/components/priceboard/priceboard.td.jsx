@@ -26,7 +26,6 @@ class HighlightRow extends Component {
     const { highlightClass, highlightIcon } = this.state;
     return (
       <td className={`${className} ${highlightClass}`} style={style}>
-        <i className={`fa fa-arrow-${highlightIcon}`}></i>
         <span>{span}</span>
       </td>
     );

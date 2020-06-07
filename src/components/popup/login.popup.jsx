@@ -26,6 +26,7 @@ class LoginPopup extends Component {
     let { username, password } = this.state.loginData;
     return (
       <div className="login-form">
+                <hr />
         <form>
           <div className="form-group">
             <input

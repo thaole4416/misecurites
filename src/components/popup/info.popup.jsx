@@ -1,25 +1,61 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
 import SkyLight from "react-skylight";
 
-
 class InfoPopup extends Component {
-    constructor(props) {
-        super(props)
+  constructor(props) {
+    super(props);
 
-        this.state = {
-                 
-        }
-    }
+    this.state = {};
+  }
 
-    render() {
+  render() {
+    return (
+      <div className="infoPopup" >
+                <hr />
+        {this.props.info && (
+          <table className="table--left" style={{ border: "none" }}>
+            <tbody>
+              <tr>
+                <td>Tên tài khoản</td>
+                <td>{this.props.info.tenTaiKhoan}</td>
+              </tr>
+              <tr>
+                <td>Số tài khoản</td>
+                <td>{this.props.info._id}</td>
+              </tr>
+              <tr>
+                <td>CMND</td>
+                <td>{this.props.info.CMND}</td>
+              </tr>
+              <tr>
+                <td>Email</td>
+                <td>{this.props.info.email}</td>
+              </tr>
+              <tr>
+                <td>Ngày cấp</td>
+                <td>{this.props.info.ngayCap}</td>
+              </tr>
+              <tr>
+                <td>Ngày sinh</td>
+                <td>{this.props.info.ngaySinh}</td>
+              </tr>
+              <tr>
+                <td>Nơi cấp</td>
+                <td>{this.props.info.noiCap}</td>
+              </tr>
+              <tr>
+                <td>Số điện thoại</td>
+                <td>{this.props.info.soDienThoai}</td>
+              </tr>
+              <tr>
+                <td>Số dư</td>
+                <td>{this.props.info.soDu}</td>
+              </tr>
+            </tbody>
+          </table>
+        )}
 
-
-        return (
-          <div className="infoPopup" style={{ paddingTop: 15 }}>
-            <div>Số dư tiền: </div>
-            <div>Tiền chờ về: </div>
-            <div>Số dư cổ phiếu: </div>
-          <table className="table-top" style={{ background: "black" }}>
+        {/* <table className="table-top" style={{ background: "black" }}>
             <thead style={{ color: "white", fontWeight: "100" }}>
               <tr>
                 <th className={`th `} style={{ width: "3%" }}>
@@ -63,10 +99,10 @@ class InfoPopup extends Component {
                 </td>
               </tr>
             </tbody>
-          </table>
-        </div>
-        )
-    }
+          </table> */}
+      </div>
+    );
+  }
 }
 
-export default InfoPopup
+export default InfoPopup;

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-
+import { emitter } from "../../emitter";
 import { getOrderTypes } from "../../helpers/orderTypes";
 class OrderPopup extends Component {
   constructor(props) {
@@ -28,9 +28,38 @@ class OrderPopup extends Component {
         value: "",
         errors: [],
       },
-      type: "LO",
+      type: "Không có lệnh phù hợp",
     };
   }
+
+  listenEvent = () => {
+    emitter.on(`verifySuccess`, () => {
+      this.setState({
+        symbol: {
+          value: "",
+          errors: [],
+        },
+        orderStock: {
+          value: {
+            floor: "",
+            ceiling: "",
+            reference: "",
+            exchange: "",
+          },
+          errors: [],
+        },
+        price: {
+          value: "",
+          errors: [],
+        },
+        volume: {
+          value: "",
+          errors: [],
+        },
+        type: "Không có lệnh phù hợp",
+      });
+    });
+  };
 
   changeSymbol = (event) => {
     let symbol = event.target.value.toUpperCase();
@@ -75,7 +104,23 @@ class OrderPopup extends Component {
 
   changeVolume = (event) => {
     const volume = event.target.value;
-    this.state.volume.value = volume;
+    const price = this.state.price.value;
+    let isBuy = document.getElementsByClassName("toggle btn btn-success")
+      .length;
+    this.state.volume = { value: volume, errors: [] };
+    if (isBuy && price * volume > this.props.user.soDu) {
+      this.state.volume.errors.push("Số dư không đủ");
+    }
+    const soDu = this.props.user.danhMuc.find(
+      (x) => x.maCoPhieu == this.state.symbol.value
+    )
+      ? this.props.user.danhMuc.find(
+          (x) => x.maCoPhieu == this.state.symbol.value
+        ).khoiLuong
+      : 0;
+    if (!isBuy && volume > soDu) {
+      this.state.volume.errors.push("Cổ phiếu không đủ");
+    }
     this.setState((state) => ({ ...state }));
   };
 
@@ -83,24 +128,76 @@ class OrderPopup extends Component {
     this.setState({ type: event.target.value });
   };
 
-  handleSubmit = () => {
+  handleSubmit = (event) => {
     let isBuy = document.getElementsByClassName("toggle btn btn-success")
       .length;
     const { symbol, orderStock, price, volume, type } = this.state;
-    this.props.callback({
-      token: this.props.user.token,
-      maCoPhieu: symbol.value,
-      loaiLenh: `${isBuy ? "mua" : "bán"} ${type}`,
-      khoiLuong: volume.value,
-      gia: price.value,
-      maSan: orderStock.value.exchange
+    this.state.orderStock.errors = [];
+    this.state.price.errors = [];
+    this.state.volume.errors = [];
+    if (symbol.value.length === 0) {
+      this.state.symbol.errors.push("Chưa chọn mã cổ phiếu");
+    }
+    if (symbol.value.length === 3) {
+      const orderStock = this.props.allStocks.find(
+        (stock) => stock._id === symbol.value
+      );
+      if (orderStock) {
+        this.state.orderStock.value.ceiling = orderStock.giaTran;
+        this.state.orderStock.value.floor = orderStock.giaSan;
+        this.state.orderStock.value.reference = orderStock.giaThamChieu;
+        this.state.orderStock.value.exchange = orderStock.maSan;
+      } else {
+        this.state.symbol.errors.push("Mã cổ phiếu không tồn tại");
+      }
+    }
+    if (price.value > orderStock.value.ceiling) {
+      this.state.price.errors.push("Giá không được lớn hơn giá trần");
+    }
+    if (price.value < orderStock.value.floor) {
+      this.state.price.errors.push("Giá không được nhỏ hơn giá sàn");
+    }
+    if (isBuy && price.value * volume.value > this.props.user.soDu) {
+      this.state.volume.errors.push("Số dư không đủ");
+    }
+    const soDu = this.props.user.danhMuc.find(
+      (x) => x.maCoPhieu == this.state.symbol.value
+    )
+      ? this.props.user.danhMuc.find(
+          (x) => x.maCoPhieu == this.state.symbol.value
+        ).khoiLuong
+      : 0;
+    if (!isBuy && volume.value > soDu) {
+      this.state.volume.errors.push("Cổ phiếu không đủ");
+    }
+    let count = 0;
+    Object.values(this.state).forEach((state) => {
+      if (typeof state == "object" && state.errors.length != 0) count++;
     });
+    if (!count )
+      this.props.callback({
+        token: this.props.user.token,
+        maCoPhieu: symbol.value,
+        loaiLenh: `${isBuy ? "mua" : "bán"} ${type}`,
+        khoiLuong: volume.value,
+        gia: price.value,
+        maSan: orderStock.value.exchange,
+      });
+    else {
+      event.preventDefault();
+      this.setState((state) => ({ ...state }));
+    }
   };
+
+  componentDidMount() {
+    this.listenEvent();
+  }
 
   render() {
     const { symbol, orderStock, price, volume, type } = this.state;
     return (
-      <div className="orderPopup" style={{ padding: 15 }}>
+      <div className="orderPopup popup" style={{ padding: 15, paddingTop: 0 }}>
+        <hr />
         <input
           type="checkbox"
           checked
@@ -122,11 +219,11 @@ class OrderPopup extends Component {
           />
         </div>
         {symbol.errors.map((error) => (
-          <div className="bg-danger text-white p-2">{error}</div>
+          <div className="text-danger p-2">{error}</div>
         ))}
         <hr />
         <div style={{ marginBottom: "8px" }}>
-          <span className="white">Cổ phiếu: {symbol.value}</span>
+          <span className="black">Cổ phiếu: {symbol.value}</span>
         </div>
         <div>
           <span className="purple" style={{ display: "block" }}>
@@ -151,7 +248,7 @@ class OrderPopup extends Component {
                 onChange={this.changePrice}
               />
               {price.errors.map((error) => (
-                <div className="bg-danger text-white p-2">{error}</div>
+                <div className="text-danger p-2">{error}</div>
               ))}
             </div>
             <div className="col-12 p-2">
@@ -163,6 +260,9 @@ class OrderPopup extends Component {
                 value={volume.value}
                 onChange={this.changeVolume}
               />
+              {volume.errors.map((error) => (
+                <div className="text-danger p-2">{error}</div>
+              ))}
             </div>
             <div className="col-12 p-2">
               <select
@@ -174,16 +274,22 @@ class OrderPopup extends Component {
                 onChange={this.changeType}
               >
                 {getOrderTypes(orderStock.value.exchange).map((type) => (
-                  <option value={type} >
-                    {type}
-                  </option>
+                  <option value={type}>{type}</option>
                 ))}
               </select>
             </div>
           </div>
         </div>
         <hr />
-        <button className="btn btn-block button" onClick={this.handleSubmit}>
+        <div
+          class="g-recaptcha"
+          data-sitekey="6LdNJgEVAAAAAFNDROJEpsDbd8jtRdsHqw66_Sjw"
+        >
+        </div>
+        <button
+          className="btn btn-block button disable"
+          onClick={this.handleSubmit}
+        >
           Đặt lệnh
         </button>
       </div>

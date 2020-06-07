@@ -1,16 +1,54 @@
-.form-control, a:hover {
-    color: black;
+.form-control,
+a {
+  color: rgb(21, 27, 30);
 }
-.orderPopup{
-    margin-top: 25px;
+.form-control,
+a:hover {
+  color: rgb(21, 27, 30);
+}
+.orderPopup {
+  margin-top: 25px;
 }
 .toggle.btn-success {
-    width: 100%!important;
+  width: 100% !important;
 }
 .toggle.btn-danger {
-    width: 100%!important;
+  width: 100% !important;
 }
 
-.skylight-close-button{
-    display: none;
+.skylight-close-button {
+  display: none;
+}
+
+.popup .table-top {
+  height: 100%;
+  font-size: 13px;
+  margin-bottom: -2px;
+  background-color: rgb(241, 241, 243);
+  vertical-align: middle;
+  border-collapse: collapse;
+}
+
+.popup table thead {
+  font-size: 12px;
+  border: 1px solid #282828;
+  border-bottom: 2px solid #faa51d;
+}
+
+.popup table tbody:nth-child(even) {
+  background-color: #111111;
+}
+
+.popup table tbody tr:hover td {
+  background-color: rgb(223, 237, 252) !important;
+  border: none;
+}
+
+.popup table td .bg-success,.danhMuc table td .bg-danger{
+    cursor: pointer;
+    color: white ;
+}
+
+.popup .td{
+  text-align: center;
 }

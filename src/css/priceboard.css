@@ -4,11 +4,10 @@
   height: 30px;
 }
 .btn-menu {
-  color: white;
+  color: rgb(21, 27, 30);
   height: 110%;
   width: 80px;
-  background-color: #111111;
-  border: 1px solid #111111;
+  border: none;
 }
 
 .button-menu {
@@ -21,6 +20,7 @@
 
 .menu .active {
   background-color: #f7941d !important;
+  color: white;
 }
 
 .menu .input {
@@ -61,8 +61,7 @@
   height: 100%;
   font-size: 13px;
   margin-bottom: -2px;
-  background-color: #181818;
-  color: white;
+  background-color: rgb(241, 241, 243);
   text-align: right;
   vertical-align: middle;
   border-collapse: collapse;
@@ -78,8 +77,8 @@
   background-color: #111111;
 }
 
-#stocks_list table tbody tr:hover {
-  background-color: #282828;
+#stocks_list table tbody tr:hover td{
+  background-color: rgb(223, 237, 252)!important;
   border: none;
 }
 
@@ -101,7 +100,7 @@ th {
 .table-top thead th {
   font-weight: 400;
   font-size: 13px;
-  border: 1px solid #282828;
+  border: 1px solid rgb(228, 230, 233);
 }
 
 .table-top thead {
@@ -153,7 +152,7 @@ th {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-left: 1px solid #282828;
+  border-left: 1px solid rgb(228, 230, 233);
 }
 
 .table-row  i {
@@ -193,11 +192,11 @@ th {
 
 
 .highlight {
-  background-color: #181818;
+  background-color: rgb(255, 255, 255);
 }
 
 .highlight:nth-child(even) {
-  background-color: #111111;
+  background-color: rgb(241, 241, 243);
 }
 
 span {
