@@ -232,6 +232,7 @@ class RegisterPopup extends Component {
                 value={this.state.ngaySinh.value}
                 className="reactDatez"
                 placeholder="Ngày sinh"
+                allowPast={true}
               />
               {this.state.ngaySinh.errors.map((error) => (
                 <div className="text-danger p-1">{error}</div>
@@ -344,6 +345,7 @@ class RegisterPopup extends Component {
                 value={this.state.ngayCap.value}
                 className="reactDatez"
                 placeholder="Ngày cấp"
+                allowPast={true}
               />
               {this.state.ngayCap.errors.map((error) => (
                 <div className="text-danger p-1">{error}</div>
