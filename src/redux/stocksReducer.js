@@ -43,7 +43,7 @@ export const getHistorySuccess = (payload) => ({
 const stocks = (state = data, action) => {
   switch (action.type) {
     case actionTypes.SET_STOCKS:
-      state = action.payload;
+    state = action.payload;
       return [...state];
     case actionTypes.SET_STOCK:
       state[state.findIndex(x => x.symbol == action.payload.symbol)] = action.payload

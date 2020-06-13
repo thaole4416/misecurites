@@ -378,9 +378,9 @@ class Header extends Component {
                     <div className="p-1">
                       Phiên:{" "}
                       {this.state.phien === 1
-                        ? this.state.phien === 3
-                          ? "liên tục"
-                          : "định kỳ"
+                          ?  "định kỳ"
+                        : this.state.phien === 3 ?
+                        "liên tục"
                         : ""}
                     </div>
                     <hr />

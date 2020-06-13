@@ -70,16 +70,38 @@ class Tbody extends Component {
           <table className="table-row">
             <tbody>
               {this.state.isLoadEnd ? (
-                this.props.stocks.map((stockData) =>
-                  stockData.exchange == this.props.exchange ? (
-                    <TRow
-                      key={index}
-                      index={index++}
-                      stock_data={stockData}
-                      click={this.click}
-                      isCheckHighLight={this.state.isCheckHighLight}
-                    />
-                  ) : null
+                this.props.stocks.find(
+                  (x) => x.exchange === this.props.exchange
+                ) ? (
+                  this.props.stocks.map((stockData) =>
+                    stockData.exchange == this.props.exchange ? (
+                      <TRow
+                        key={index}
+                        index={index++}
+                        stock_data={stockData}
+                        click={this.click}
+                        isCheckHighLight={this.state.isCheckHighLight}
+                      />
+                    ) : null
+                  )
+                ) : (
+                  this.props.allStocks.map((stockData) =>
+                    stockData.maSan == this.props.exchange ? (
+                      <TRow
+                        key={index}
+                        index={index++}
+                        stock_data={{
+                          symbol: stockData._id,
+                          ceiling: stockData.giaTran,
+                          floor: stockData.giaSan,
+                          reference: stockData.giaSan,
+                          exchange: stockData.maSan,
+                        }}
+                        click={this.click}
+                        isCheckHighLight={this.state.isCheckHighLight}
+                      />
+                    ) : null
+                  )
                 )
               ) : (
                 <tr colSpan="21">
@@ -104,8 +126,9 @@ class Tbody extends Component {
   }
 }
 
-const mapStateToProps = ({ stocks, exchange, user, otp }) => ({
+const mapStateToProps = ({allStocks, stocks, exchange, user, otp }) => ({
   stocks: stocks,
+  allStocks: allStocks,
   exchange: exchange,
   user: user,
   otp: otp,

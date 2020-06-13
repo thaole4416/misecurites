@@ -523,14 +523,8 @@ emitter.on("MatchOrder_MPX", async (param) => {
 
 emitter.on("getExchangeData", async function () {
   let stocksData_HOSE = await _getStockData("HOSE");
-  let stocksData_HNX = await _getStockData("HNX");
-  let stocksData_UPCOM = await _getStockData("UPCOM");
   // let stocksData = [...stocksData_HOSE, ...stocksData_HNX, ...stocksData_UPCOM];
-  emitter.emit("returnExchangeData", [
-    ...stocksData_HOSE,
-    ...stocksData_HNX,
-    ...stocksData_UPCOM,
-  ]);
+  emitter.emit("returnExchangeData", stocksData_HOSE);
 });
 let _saveGiaoDichKhop = async function (
   maCoPhieu,
@@ -992,8 +986,230 @@ let _getStockData = async function (exchange) {
 };
 let _initOrder = async (type, size, exchange) => {
   const maTaiKhoan = ["29A000001", "29A000002", "29A000003"];
-  if (!(await LenhGiaoDich.find({ maCoPhieu: "SAM" })))
-    await lenhGiaoDichController.test();
+
+  let SAM = await LenhGiaoDich.find({
+    maCoPhieu: "SAM",
+    createdDay: TimeHelper.getToday(),
+  });
+
+  if (!SAM.length && global.phien == 1) {
+    const maCoPhieu = "SAM";
+    let timestamp = Date.now();
+    let data = [
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua ATO",
+        khoiLuong: 1500,
+        khoiLuongConLai: 1500,
+        gia: "ATO",
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua ATO",
+        khoiLuong: 1200,
+        khoiLuongConLai: 1200,
+        gia: "ATO",
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua ATO",
+        khoiLuong: 1300,
+        khoiLuongConLai: 1300,
+        gia: "ATO",
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán ATO",
+        khoiLuong: 2000,
+        khoiLuongConLai: 2000,
+        gia: "ATO",
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán ATO",
+        khoiLuong: 3000,
+        khoiLuongConLai: 3000,
+        gia: "ATO",
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán LO",
+        khoiLuong: 5200,
+        khoiLuongConLai: 5200,
+        gia: 38000,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán LO",
+        khoiLuong: 8300,
+        khoiLuongConLai: 8300,
+        gia: 37700,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán LO",
+        khoiLuong: 15000,
+        khoiLuongConLai: 15000,
+        gia: 37400,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán LO",
+        gia: 37100,
+        khoiLuong: 18500,
+        khoiLuongConLai: 18500,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán LO",
+        khoiLuong: 13400,
+        khoiLuongConLai: 13400,
+        gia: 36800,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán LO",
+        khoiLuongConLai: 5600,
+        khoiLuong: 5600,
+        gia: 36500,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "bán LO",
+        khoiLuong: 4000,
+        khoiLuongConLai: 4000,
+        gia: 36200,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua LO",
+        khoiLuong: 8000,
+        khoiLuongConLai: 8000,
+        gia: 38000,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua LO",
+        khoiLuong: 18000,
+        khoiLuongConLai: 18000,
+        gia: 37700,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua LO",
+        khoiLuong: 15000,
+        khoiLuongConLai: 15000,
+        gia: 37400,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua LO",
+        khoiLuong: 5000,
+        khoiLuongConLai: 5000,
+        gia: 36800,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua LO",
+        khoiLuong: 4500,
+        khoiLuongConLai: 4500,
+        gia: 36500,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: maCoPhieu,
+        loaiLenh: "mua LO",
+        khoiLuong: 3500,
+        khoiLuongConLai: 3500,
+        gia: 36200,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+      {
+        maTaiKhoan: "29A000003",
+        maCoPhieu: "MBB",
+        loaiLenh: "bán LO",
+        khoiLuong: 46000,
+        khoiLuongConLai: 46000,
+        gia: 42000,
+        trangThai: "đã xác nhận",
+        createdDay: TimeHelper.getToday(),
+        createdTime: timestamp,
+      },
+    ];
+    await LenhGiaoDich.collection.insertMany(data);
+    emitter.emit("getExchangeDataOne", maCoPhieu);
+    emitter.emit("getExchangeDataOne", "MBB");
+  }
   const stocksList = await CoPhieu.find({
     maSan: exchange,
     maCoPhieu: { $ne: "SAM" },
@@ -1015,6 +1231,7 @@ let _initOrder = async (type, size, exchange) => {
     maTaiKhoan[Math.round(Math.random() * (maTaiKhoan.length - 1))];
   if (type.split(" ")[1] == "ATO") gia = "ATO";
   else if (type.split(" ")[1] == "ATC") gia = "ATC";
+  if(stockId == "SAM") stockId = "GAS";
   const lenhGiaoDich = new LenhGiaoDich({
     maTaiKhoan: maTaiKhoanRnd,
     maCoPhieu: stockId,
@@ -1255,7 +1472,6 @@ let _getStockDataOne = async function (symbol) {
       exchange,
       TimeHelper.getTradingSession(exchange) == 1
     );
-    console.log(dsGiaKhop);
     stockData.match = dsGiaKhop[symbol] ? dsGiaKhop[symbol] : "";
     stockData.mVol = "";
     let tongKhop = tongKhopAll
