@@ -23,7 +23,6 @@ import DanhMuc from "../popup/danhMuc.popup";
 import { toast } from "react-toastify";
 
 const socket = socketIOClient(
-  `http://localhost:${process.env.REACT_APP_IO_SERVER}`
 );
 class Menu extends Component {
   constructor(props) {

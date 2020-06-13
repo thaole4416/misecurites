@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-
+const path=require('path');
 const routes = require("./routes");
 require("./constants");
 const emitter = require("./emitter");
@@ -17,6 +17,10 @@ app.use(express.json());
 
 require("./database");
 require("./helpers/MatchOrder");
+app.use(express.static(path.join(__dirname, "build")));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 app.use("/api", routes);
 

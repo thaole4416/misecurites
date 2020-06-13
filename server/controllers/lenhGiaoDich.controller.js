@@ -7,222 +7,129 @@ let LenhGiaoDich = require("../models/lenhGiaoDich.model");
 const emitter = require("../emitter");
 const request = require("request");
 async function create(req, res) {
-  // let captchaResponse = req.body.captcha;
-  // if (captchaResponse) {
-  //   request(
-  //     {
-  //       url: "https://www.google.com/recaptcha/api/siteverify",
-  //       method: "POST",
-  //       form: {
-  //         secret: "6LcLKwEVAAAAAA0Q-hISl0Y7mXKPkujiEvslL0a5",
-  //         response: captchaResponse,
-  //       },
-  //     },
-  //     async function (error, response, body) {
-  //       // Parse String thành JSON object
-  //       try {
-  //         body = JSON.parse(body);
-  //       } catch (err) {
-  //         body = {};
-  //       }
+  let captchaResponse = req.body.captcha;
+  if (captchaResponse) {
+    request(
+      {
+        url: "https://www.google.com/recaptcha/api/siteverify",
+        method: "POST",
+        form: {
+          secret: "6LcLKwEVAAAAAA0Q-hISl0Y7mXKPkujiEvslL0a5",
+          response: captchaResponse,
+        },
+      },
+      async function (error, response, body) {
+        // Parse String thành JSON object
+        try {
+          body = JSON.parse(body);
+        } catch (err) {
+          body = {};
+        }
 
-  //       if (!error && response.statusCode == 200 && body.success) {
-  //         // Captcha hợp lệ, xử lý tiếp phần đăng ký tài khoản
-  //         //NOTE: thiếu mã cổ phiếu ở đây;
-  //         const maCoPhieu = req.body.maCoPhieu;
-  //         if (
-  //           ![
-  //             ...global.stocks["HOSE"],
-  //             ...global.stocks["HNX"],
-  //             ...global.stocks["UPCOM"],
-  //           ].includes(maCoPhieu)
-  //         ) {
-  //           return res.json({
-  //             status: "FAIL",
-  //             message: "Mã cổ phiếu không tồn tại",
-  //           });
-  //         }
-  //         const loaiLenh = req.body.loaiLenh;
-  //         if (
-  //           ![
-  //             "mua LO",
-  //             "mua MP",
-  //             "mua MOK",
-  //             "mua MTL",
-  //             "mua MAK",
-  //             "mua ATC",
-  //             "mua ATO",
-  //             "bán LO",
-  //             "bán MP",
-  //             "bán MOK",
-  //             "bán MTL",
-  //             "bán MAK",
-  //             "bán ATC",
-  //             "bán ATO",
-  //           ].includes(loaiLenh)
-  //         ) {
-  //           return res.json({
-  //             status: "FAIL",
-  //             message: "loại lệnh không hợp lệ",
-  //           });
-  //         }
-  //         const khoiLuong = req.body.khoiLuong;
-  //         const gia = req.body.gia;
-  //         let timestamp = Date.now();
-  //         const lenhGiaoDich = new LenhGiaoDich({
-  //           maTaiKhoan: req.userInfo.id,
-  //           maCoPhieu: maCoPhieu,
-  //           loaiLenh: loaiLenh,
-  //           khoiLuong: khoiLuong,
-  //           khoiLuongConLai: khoiLuong,
-  //           gia: gia,
-  //           trangThai: "đã xác nhận",
-  //           createdDay: TimeHelper.getToday(),
-  //           createdTime: timestamp,
-  //         });
-  //         try {
-  //           let result = await lenhGiaoDich.save(req);
-  //           //neu la phien lien tuc thi moi match order
-  //           const tradingSession = TimeHelper.getTradingSession(req.body.maSan);
-  //           if (tradingSession == 1 || tradingSession == 2) {
-  //             emitter.emit("getExchangeDataOne",maCoPhieu);
-  //             return res.json({
-  //               status: "OK",
-  //               message: "Them thanh cong lenh!",
-  //             });
-  //           } else if (tradingSession == 3) {
-  //             if (loaiLenh.split(" ")[1] == "LO") {
-  //               if (loaiLenh.split(" ")[0] == "mua") {
-  //                 let soDu = await SoDuTien.findOne({
-  //                   maTaiKhoan: req.userInfo.id,
-  //                 });
-  //                 await soDu.updateOne({
-  //                   soDu: soDu.soDu - khoiLuong * (gia * 1),
-  //                 });
-  //               } else if (loaiLenh.split(" ")[0] == "bán") {
-  //                 let soDu = await SoDuCoPhieu.findOne({
-  //                   maTaiKhoan: req.userInfo.id,
-  //                   maCoPhieu: maCoPhieu,
-  //                 });
-  //                 await soDu.updateOne({
-  //                   khoiLuong: soDu.khoiLuong - khoiLuong,
-  //                 });
-  //               }
-  //               emitter.emit("MatchOrder_LO", [maCoPhieu, gia, loaiLenh]);
-  //               return res.json({
-  //                 status: "OK",
-  //                 message: "Them thanh cong lenh!",
-  //               });
-  //             } else
-  //               emitter.emit("MatchOrder_MPX", {
-  //                 lenhGiaoDich: result,
-  //                 res: res,
-  //               });
-  //           }
-  //         } catch (error) {
-  //           res.json({ status: "FAIL", message: error.toString() });
-  //         }
-  //       } else {
-  //         res.json({ status: "FAIL", message: "Captcha không hợp lệ" });
-  //       }
-  //     }
-  //   );
-  // } else {
-  //   // Xử lý lỗi nếu không có Captcha
-  //   res.json({ status: "FAIL", message: "Không có catpcha" });
-  // }
-  const maCoPhieu = req.body.maCoPhieu;
-  if (
-    ![
-      ...global.stocks["HOSE"],
-      ...global.stocks["HNX"],
-      ...global.stocks["UPCOM"],
-    ].includes(maCoPhieu)
-  ) {
-    return res.json({
-      status: "FAIL",
-      message: "Mã cổ phiếu không tồn tại",
-    });
-  }
-  const loaiLenh = req.body.loaiLenh;
-  if (
-    ![
-      "mua LO",
-      "mua MP",
-      "mua MOK",
-      "mua MTL",
-      "mua MAK",
-      "mua ATC",
-      "mua ATO",
-      "bán LO",
-      "bán MP",
-      "bán MOK",
-      "bán MTL",
-      "bán MAK",
-      "bán ATC",
-      "bán ATO",
-    ].includes(loaiLenh)
-  ) {
-    return res.json({
-      status: "FAIL",
-      message: "loại lệnh không hợp lệ",
-    });
-  }
-  const khoiLuong = req.body.khoiLuong;
-  const gia = req.body.gia;
-  let timestamp = Date.now();
-  const lenhGiaoDich = new LenhGiaoDich({
-    maTaiKhoan: req.userInfo.id,
-    maCoPhieu: maCoPhieu,
-    loaiLenh: loaiLenh,
-    khoiLuong: khoiLuong,
-    khoiLuongConLai: khoiLuong,
-    gia: gia,
-    trangThai: "đã xác nhận",
-    createdDay: TimeHelper.getToday(),
-    createdTime: timestamp,
-  });
-  try {
-    let result = await lenhGiaoDich.save(req);
-    //neu la phien lien tuc thi moi match order
-    const tradingSession = TimeHelper.getTradingSession(req.body.maSan);
-    if (tradingSession == 1 || tradingSession == 2) {
-      emitter.emit("getExchangeDataOne", maCoPhieu);
-      return res.json({
-        status: "OK",
-        message: "Them thanh cong lenh!",
-      });
-    } else if (tradingSession == 3) {
-      if (loaiLenh.split(" ")[1] == "LO") {
-        if (loaiLenh.split(" ")[0] == "mua") {
-          let soDu = await SoDuTien.findOne({
-            maTaiKhoan: req.userInfo.id,
-          });
-          await soDu.updateOne({
-            soDu: soDu.soDu - khoiLuong * (gia * 1),
-          });
-        } else if (loaiLenh.split(" ")[0] == "bán") {
-          let soDu = await SoDuCoPhieu.findOne({
+        if (!error && response.statusCode == 200 && body.success) {
+          // Captcha hợp lệ, xử lý tiếp phần đăng ký tài khoản
+          //NOTE: thiếu mã cổ phiếu ở đây;
+          const maCoPhieu = req.body.maCoPhieu;
+          if (
+            ![
+              ...global.stocks["HOSE"],
+              ...global.stocks["HNX"],
+              ...global.stocks["UPCOM"],
+            ].includes(maCoPhieu)
+          ) {
+            return res.json({
+              status: "FAIL",
+              message: "Mã cổ phiếu không tồn tại",
+            });
+          }
+          const loaiLenh = req.body.loaiLenh;
+          if (
+            ![
+              "mua LO",
+              "mua MP",
+              "mua MOK",
+              "mua MTL",
+              "mua MAK",
+              "mua ATC",
+              "mua ATO",
+              "bán LO",
+              "bán MP",
+              "bán MOK",
+              "bán MTL",
+              "bán MAK",
+              "bán ATC",
+              "bán ATO",
+            ].includes(loaiLenh)
+          ) {
+            return res.json({
+              status: "FAIL",
+              message: "loại lệnh không hợp lệ",
+            });
+          }
+          const khoiLuong = req.body.khoiLuong;
+          const gia = req.body.gia;
+          let timestamp = Date.now();
+          const lenhGiaoDich = new LenhGiaoDich({
             maTaiKhoan: req.userInfo.id,
             maCoPhieu: maCoPhieu,
+            loaiLenh: loaiLenh,
+            khoiLuong: khoiLuong,
+            khoiLuongConLai: khoiLuong,
+            gia: gia,
+            trangThai: "đã xác nhận",
+            createdDay: TimeHelper.getToday(),
+            createdTime: timestamp,
           });
-          await soDu.updateOne({
-            khoiLuong: soDu.khoiLuong - khoiLuong,
-          });
+          try {
+            let result = await lenhGiaoDich.save(req);
+            //neu la phien lien tuc thi moi match order
+            const tradingSession = TimeHelper.getTradingSession(req.body.maSan);
+            if (tradingSession == 1 || tradingSession == 2) {
+              emitter.emit("getExchangeDataOne", maCoPhieu);
+              return res.json({
+                status: "OK",
+                message: "Them thanh cong lenh!",
+              });
+            } else if (tradingSession == 3) {
+              if (loaiLenh.split(" ")[1] == "LO") {
+                if (loaiLenh.split(" ")[0] == "mua") {
+                  let soDu = await SoDuTien.findOne({
+                    maTaiKhoan: req.userInfo.id,
+                  });
+                  await soDu.updateOne({
+                    soDu: soDu.soDu - khoiLuong * (gia * 1),
+                  });
+                } else if (loaiLenh.split(" ")[0] == "bán") {
+                  let soDu = await SoDuCoPhieu.findOne({
+                    maTaiKhoan: req.userInfo.id,
+                    maCoPhieu: maCoPhieu,
+                  });
+                  await soDu.updateOne({
+                    khoiLuong: soDu.khoiLuong - khoiLuong,
+                  });
+                }
+                emitter.emit("MatchOrder_LO", [maCoPhieu, gia, loaiLenh]);
+                return res.json({
+                  status: "OK",
+                  message: "Them thanh cong lenh!",
+                });
+              } else
+                emitter.emit("MatchOrder_MPX", {
+                  lenhGiaoDich: result,
+                  res: res,
+                });
+            }
+          } catch (error) {
+            res.json({ status: "FAIL", message: error.toString() });
+          }
+        } else {
+          res.json({ status: "FAIL", message: "Captcha không hợp lệ" });
         }
-        emitter.emit("MatchOrder_LO", [maCoPhieu, gia, loaiLenh]);
-        return res.json({
-          status: "OK",
-          message: "Them thanh cong lenh!",
-        });
-      } else
-        emitter.emit("MatchOrder_MPX", {
-          lenhGiaoDich: result,
-          res: res,
-        });
-    }
-  } catch (error) {
-    res.json({ status: "FAIL", message: error.toString() });
+      }
+    );
+  } else {
+    // Xử lý lỗi nếu không có Captcha
+    res.json({ status: "FAIL", message: "Không có catpcha" });
   }
 }
 function getAll(req, res) {
@@ -458,8 +365,8 @@ async function test(req, res) {
     },
   ];
   await LenhGiaoDich.collection.insertMany(data);
-  emitter.emit("getExchangeDataOne",maCoPhieu);
-  emitter.emit("getExchangeDataOne","MBB");
+  emitter.emit("getExchangeDataOne", maCoPhieu);
+  emitter.emit("getExchangeDataOne", "MBB");
   res.json("Thành công");
 }
 async function test2(req, res) {
@@ -761,9 +668,9 @@ function phien(req, res) {
 }
 async function setPhien(req, res) {
   global.phien = req.body.phien;
-  await LenhGiaoDich.deleteMany()
-  await GiaoDichKhop.deleteMany()
-  emitter.emit("getExchangeData")
+  await LenhGiaoDich.deleteMany();
+  await GiaoDichKhop.deleteMany();
+  emitter.emit("getExchangeData");
   return res.json({ status: "OK" });
 }
 function init(req, res) {
