@@ -367,7 +367,7 @@ async function test(req, res) {
   await LenhGiaoDich.collection.insertMany(data);
   emitter.emit("getExchangeDataOne", maCoPhieu);
   emitter.emit("getExchangeDataOne", "MBB");
-  res.json("Thành công");
+  if(res)res.json("Thành công");
 }
 async function test2(req, res) {
   const maCoPhieu = "FPT";

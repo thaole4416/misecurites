@@ -8,6 +8,7 @@ const TaiKhoan = require("./models/taiKhoan.model");
 const LenhGiaoDich = require("./models/lenhGiaoDich.model");
 const GiaoDichKhop = require("./models/giaoDichKhop.model");
 const GiaHelper = require("./helpers/MatchOrder");
+const lenhGiaoDichController = require("./controllers/lenhGiaoDich.controller");
 const orderType = Object.freeze({
   buy: "mua",
   sell: "bán",
@@ -991,7 +992,12 @@ let _getStockData = async function (exchange) {
 };
 let _initOrder = async (type, size, exchange) => {
   const maTaiKhoan = ["29A000001", "29A000002", "29A000003"];
-  const stocksList = await CoPhieu.find({ maSan: exchange });
+  if (!(await LenhGiaoDich.find({ maCoPhieu: "SAM" })))
+    await lenhGiaoDichController.test();
+  const stocksList = await CoPhieu.find({
+    maSan: exchange,
+    maCoPhieu: { $ne: "SAM" },
+  });
   const khoiLuong = [1000, 1500, 2000, 2500, 3000];
   let timestamp = Date.now();
   let stockPosition = Math.round(Math.random() * (stocksList.length - 1));
@@ -1249,7 +1255,7 @@ let _getStockDataOne = async function (symbol) {
       exchange,
       TimeHelper.getTradingSession(exchange) == 1
     );
-    console.log(dsGiaKhop)
+    console.log(dsGiaKhop);
     stockData.match = dsGiaKhop[symbol] ? dsGiaKhop[symbol] : "";
     stockData.mVol = "";
     let tongKhop = tongKhopAll
