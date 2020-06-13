@@ -96,57 +96,60 @@ function getTimeSpan(timeObj) {
  * -1: nothing
  */
 function getTradingSession(exchange) {
-  const now = new Date();
-  const timeNow = now.getTime();
-  const start_DinhKy_Mo = getTimeSpan([9, 0, 0, 0]);
-  const end_DinhKy_Mo = getTimeSpan([9, 15, 0, 0]);
-  const start_DinhKy_Dong = getTimeSpan([14, 30, 0, 0]);
-  const end_DinhKy_Dong = getTimeSpan([14, 45, 0, 0]);
-  const start_SauGio = getTimeSpan([14, 45, 0, 0]);
-  const end_SauGio = getTimeSpan([15, 0, 0, 0]);
-  const start_Nghi = getTimeSpan([11, 30, 0, 0]);
-  const end_Nghi = getTimeSpan([13, 0, 0, 0]);
-
-  if (now.getDay() != 0 && now.getDay() != 6 && !isVacation(now)) {
-    if (
-      timeNow >= start_DinhKy_Mo &&
-      timeNow < end_DinhKy_Mo &&
-      exchange == "HOSE"
-    ) {
-      return 1;
-    } else if (
-      timeNow >= start_DinhKy_Mo &&
-      timeNow < end_DinhKy_Mo &&
-      exchange != "HOSE"
-    ) {
-      return 3;
-    } else if (timeNow >= end_DinhKy_Mo && timeNow < start_Nghi) {
-      return 3;
-    } else if (timeNow >= start_Nghi && timeNow < end_Nghi) {
-      return 0;
-    } else if (timeNow >= end_Nghi && timeNow < start_DinhKy_Dong) {
-      return 3;
-    } else if (
-      timeNow >= start_DinhKy_Dong &&
-      timeNow < end_DinhKy_Dong &&
-      (exchange == "HOSE" || exchange == "HNX")
-    ) {
-      return 2;
-    } else if (
-      timeNow >= start_DinhKy_Dong &&
-      timeNow < end_DinhKy_Dong &&
-      exchange != "HOSE" &&
-      exchange != "HNX"
-    ) {
-      return 3;
-    } else if (
-      timeNow >= start_SauGio &&
-      timeNow < end_SauGio &&
-      exchange != "HNX"
-    ) {
-      return 4;
+  if(process.env.demo) return global.phien;
+  else if(!this.process.env.demo){
+    const now = new Date();
+    const timeNow = now.getTime();
+    const start_DinhKy_Mo = getTimeSpan([9, 0, 0, 0]);
+    const end_DinhKy_Mo = getTimeSpan([9, 15, 0, 0]);
+    const start_DinhKy_Dong = getTimeSpan([14, 30, 0, 0]);
+    const end_DinhKy_Dong = getTimeSpan([14, 45, 0, 0]);
+    const start_SauGio = getTimeSpan([14, 45, 0, 0]);
+    const end_SauGio = getTimeSpan([15, 0, 0, 0]);
+    const start_Nghi = getTimeSpan([11, 30, 0, 0]);
+    const end_Nghi = getTimeSpan([13, 0, 0, 0]);
+  
+    if (now.getDay() != 0 && now.getDay() != 6 && !isVacation(now)) {
+      if (
+        timeNow >= start_DinhKy_Mo &&
+        timeNow < end_DinhKy_Mo &&
+        exchange == "HOSE"
+      ) {
+        return 1;
+      } else if (
+        timeNow >= start_DinhKy_Mo &&
+        timeNow < end_DinhKy_Mo &&
+        exchange != "HOSE"
+      ) {
+        return 3;
+      } else if (timeNow >= end_DinhKy_Mo && timeNow < start_Nghi) {
+        return 3;
+      } else if (timeNow >= start_Nghi && timeNow < end_Nghi) {
+        return 0;
+      } else if (timeNow >= end_Nghi && timeNow < start_DinhKy_Dong) {
+        return 3;
+      } else if (
+        timeNow >= start_DinhKy_Dong &&
+        timeNow < end_DinhKy_Dong &&
+        (exchange == "HOSE" || exchange == "HNX")
+      ) {
+        return 2;
+      } else if (
+        timeNow >= start_DinhKy_Dong &&
+        timeNow < end_DinhKy_Dong &&
+        exchange != "HOSE" &&
+        exchange != "HNX"
+      ) {
+        return 3;
+      } else if (
+        timeNow >= start_SauGio &&
+        timeNow < end_SauGio &&
+        exchange != "HNX"
+      ) {
+        return 4;
+      } else return -1;
     } else return -1;
-  } else return -1;
+  }
 }
 
 module.exports = {

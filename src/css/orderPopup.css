@@ -44,11 +44,49 @@ a:hover {
   border: none;
 }
 
-.popup table td .bg-success,.danhMuc table td .bg-danger{
-    cursor: pointer;
-    color: white ;
+.popup table td .text-success,
+.danhMuc table td .text-danger {
+  cursor: pointer;
+}
+.popup table td .text-success:hover,
+.danhMuc table td .text-danger:hover {
+  cursor: pointer;
+  font-weight: bold;
 }
 
-.popup .td{
+.popup .td {
   text-align: center;
+}
+
+a.fa.fa-pencil-alt:hover {
+  color: green;
+}
+
+a.fa.fa-times:hover {
+  color: red;
+}
+
+.draggable {
+  display: block;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  border: 1px solid white;
+  position: absolute;
+  z-index: 9999;
+  background-color: green;
+  box-shadow:  2px 2px rgba(0, 0, 0, 0.3);
+}
+.draggable .draggableText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+}
+.draggable:hover {
+  background-color: greenyellow;
+}
+.draggable:focus {
+  outline: none;
 }

@@ -3,17 +3,20 @@ import socketIOClient from "socket.io-client";
 import { connect } from "react-redux";
 import {
   setStocks,
+  setStock,
   order,
   genOtp,
   verifyOtp,
   changeExchange,
   getDanhMuc,
   getHistory,
+  edit,
+  cancel,
+  checkEdit
 } from "../../redux/index";
 import { emitter } from "../../emitter";
 import OrderPopup from "../popup/order.popup";
 import SkyLight from "react-skylight";
-import { getAll } from "../../services/userService";
 import HistoryPopup from "../popup/history.popup";
 import OtpPopup from "../popup/otp.popup";
 import DanhMuc from "../popup/danhMuc.popup";
@@ -37,6 +40,9 @@ class Menu extends Component {
       this.props.setStocks(stocksData);
       emitter.emit("loadingStocks", true);
     });
+    socket.on(`getStock`, (stocksData) => {
+      this.props.setStock(stocksData);
+    });
     emitter.on(`verifySuccess`, () => {
       this.otpPopup.hide();
       this.props.order(this.state.order);
@@ -44,10 +50,25 @@ class Menu extends Component {
     emitter.on(`verifyFail`, (message) => {
       toast.error(message);
     });
-  };
-
-  initData = () => {
-    getAll();
+    emitter.on("orderSuccess", () => {
+      this.orderPopup.hide();
+      toast.success("Đặt lệnh thành công");
+    });
+    emitter.on("orderFail", (message) => {
+      toast.error(message);
+    });
+    emitter.on("editSuccess", () => {
+      toast.success("Sửa lệnh thành công");
+    });
+    emitter.on("editFail", (message) => {
+      toast.error(message);
+    });
+    emitter.on("cancelSuccess", () => {
+      toast.success("Hủy lệnh thành công");
+    });
+    emitter.on("cancelFail", (message) => {
+      toast.error(message);
+    });
   };
 
   changeExchange = (exchange) => {
@@ -85,6 +106,12 @@ class Menu extends Component {
     } else toast.info("Đăng nhập để thực hiện");
   };
 
+  checkSymbol = (symbol, isBuy) => {
+    this.danhMucPopup.hide();
+    emitter.emit("danhMuctoOrder", { symbol, isBuy });
+    this.orderPopup.show();
+  };
+
   clickDanhMuc = () => {
     if (this.props.user.token) {
       this.props.getDanhMuc(this.props.user.token);
@@ -99,6 +126,21 @@ class Menu extends Component {
   getDanhMuc = () => {
     this.props.getDanhMuc(this.props.user.token);
   };
+
+  edit = () => {
+    this.props.edit()
+  }
+
+  checkEdit = (symbol, isBuy, gia, khoiLuong , maLenh, loaiLenh) => {
+    this.historyPopup.hide();
+    this.props.checkEdit({gia: gia, khoiLuong: khoiLuong, maCoPhieu: symbol, maLenh: maLenh, loaiLenh: loaiLenh})
+    emitter.emit("danhMuctoOrder", { symbol, isBuy ,gia,khoiLuong});
+    this.editOrderPopup.show();
+  }
+
+  cancel = (maLenh) => {
+    this.props.cancel({maLenh: maLenh, token: this.props.user.token})
+  }
 
   componentWillUnmount() {}
 
@@ -183,8 +225,10 @@ class Menu extends Component {
         <button
           className="btn-menu order"
           onClick={() => {
-            if (this.props.user.token) this.orderPopup.show();
-            else toast.info("Đăng nhập để thực hiện");
+            if (this.props.user.token) {
+              this.orderPopup.show();
+              emitter.emit("danhMuctoOrder",({symbol:"", isBuy:false}))
+            } else toast.info("Đăng nhập để thực hiện");
           }}
         >
           Đặt lệnh
@@ -201,6 +245,14 @@ class Menu extends Component {
         <SkyLight
           dialogStyles={orderPopupStyle}
           hideOnOverlayClicked
+          ref={(ref) => (this.editOrderPopup = ref)}
+          title="Sửa lệnh"
+        >
+          <OrderPopup callback={this.edit} />
+        </SkyLight>
+        <SkyLight
+          dialogStyles={orderPopupStyle}
+          hideOnOverlayClicked
           ref={(ref) => (this.danhMucPopup = ref)}
           title="Danh mục"
         >
@@ -213,6 +265,7 @@ class Menu extends Component {
                   : []
                 : []
             }
+            checkSymbol={this.checkSymbol}
           />
         </SkyLight>
         <SkyLight
@@ -221,7 +274,7 @@ class Menu extends Component {
           ref={(ref) => (this.historyPopup = ref)}
           title="Lịch sử giao dịch"
         >
-          <HistoryPopup history={this.props.history} />
+          <HistoryPopup history={this.props.history} checkEdit={this.checkEdit} cancel={this.cancel}/>
         </SkyLight>
         <SkyLight
           dialogStyles={otpPopupStyle}
@@ -240,16 +293,21 @@ class Menu extends Component {
   }
 }
 
-const mapStateToProps = ({ stocks, user, otp, history }) => ({
+const mapStateToProps = ({ stocks, user, otp, history, symbol, editOrder }) => ({
   stocks: stocks,
   user: user,
   otp: otp,
   history: history,
+  symbol: symbol,
+  editOrder: editOrder
 });
 
 const mapDispatchToProps = (dispatch) => ({
   setStocks: (stocksData) => {
     dispatch(setStocks(stocksData));
+  },
+  setStock: (stockData) => {
+    dispatch(setStock(stockData));
   },
   order: (payload) => dispatch(order(payload)),
   genOtp: (payload) => dispatch(genOtp(payload)),
@@ -257,6 +315,9 @@ const mapDispatchToProps = (dispatch) => ({
   changeExchange: (exchange) => dispatch(changeExchange(exchange)),
   getDanhMuc: (payload) => dispatch(getDanhMuc(payload)),
   getHistory: (payload) => dispatch(getHistory(payload)),
+  edit: (payload) => dispatch(edit(payload)),
+  cancel: (payload) => dispatch(cancel(payload)),
+  checkEdit: (payload) => dispatch(checkEdit(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu);

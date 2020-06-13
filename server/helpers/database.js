@@ -78,9 +78,9 @@ async function _createTaiKhoan() {
     ];
     await TaiKhoan.collection.insertMany(data);
     await SoDuTien.collection.insertMany([
-      { maTaiKhoan: "29A000001", soDu: 1000000 },
-      { maTaiKhoan: "29A000002", soDu: 1000000 },
-      { maTaiKhoan: "29A000003", soDu: 1000000 },
+      { maTaiKhoan: "29A000001", soDu: 100000000 },
+      { maTaiKhoan: "29A000002", soDu: 100000000 },
+      { maTaiKhoan: "29A000003", soDu: 999999999999 },
     ]);
     console.log("Khởi tạo dữ liệu tài khoản thành công");
   } else {
@@ -128,6 +128,11 @@ async function _createDanhMuc() {
           {
             maCoPhieu: coPhieus[Math.round(Math.random() * coPhieus.length)]._id,
             maTaiKhoan: "29A000003",
+            khoiLuong: 100000,
+          },
+          {
+            maCoPhieu: coPhieus[Math.round(Math.random() * coPhieus.length)]._id,
+            maTaiKhoan: "STB",
             khoiLuong: 100000,
           }
         );

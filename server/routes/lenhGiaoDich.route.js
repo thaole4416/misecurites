@@ -15,23 +15,18 @@ const helper = require("../helpers/MatchOrder");
  }
  */
 route.get(base_uri + "/", lenhGiaoDichController.getAll);
-route.post(
-  base_uri + "/",
-  authMiddleware.tokenCheck,
-  lenhGiaoDichController.create
-);
+route.post(base_uri + "/",authMiddleware.tokenCheck,lenhGiaoDichController.create);
 route.delete(base_uri + "/", lenhGiaoDichController.clearAll);
-route.get(
-  base_uri + "/test",
-  authMiddleware.tokenCheck,
-  lenhGiaoDichController.test
-);
-route.get(
-  base_uri + "/test2",
-  authMiddleware.tokenCheck,
-  lenhGiaoDichController.test2
-);
+route.get(base_uri + "/test", authMiddleware.tokenCheck,lenhGiaoDichController.test);
+route.get(  base_uri + "/test2",authMiddleware.tokenCheck,lenhGiaoDichController.test2);
 route.get(base_uri + "/ATX", helper.ATX);
-route.get(base_uri + "/history", authMiddleware.tokenCheck, lenhGiaoDichController.history);
+route.get(base_uri + "/history",authMiddleware.tokenCheck,lenhGiaoDichController.history);
+route.post(base_uri + "/cancel",authMiddleware.tokenCheck,lenhGiaoDichController.cancel);
+route.post(base_uri + "/edit",authMiddleware.tokenCheck,lenhGiaoDichController.edit);
+
+route.get('/demo/phien',lenhGiaoDichController.phien)
+route.post('/demo/phien',lenhGiaoDichController.setPhien)
+route.get('/demo/init',lenhGiaoDichController.init)
+route.get('/demo/end',helper.ATX)
 
 module.exports = route;

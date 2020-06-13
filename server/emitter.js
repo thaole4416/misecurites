@@ -7,40 +7,79 @@ const CoPhieu = require("./models/coPhieu.model");
 const TaiKhoan = require("./models/taiKhoan.model");
 const LenhGiaoDich = require("./models/lenhGiaoDich.model");
 const GiaoDichKhop = require("./models/giaoDichKhop.model");
-
+const GiaHelper = require("./helpers/MatchOrder");
 const orderType = Object.freeze({
   buy: "mua",
   sell: "bán",
 });
-
-emitter.on("initData", () => {
-  let time = { hour: 21, minute: 43, second: 0, milisecond: 0 };
-  TimeHelper.excuteCodeAtTime(async function () {
-    for (let i = 0; i < 200; i++) {
-      await _initOrder(orderType.buy + " LO", 1);
-      await _initOrder(orderType.sell + " LO", 1);
+function _initEachSecond(fn) {
+  setTimeout(() => {
+    fn();
+    if (Date.now() < TimeHelper.getTimeSpan([15, 0, 0, 0])) {
+      _initEachSecond(fn);
     }
-    emitter.emit("getExchangeData");
-    emitter.emit("getExchangeData");
-    emitter.emit("getExchangeData");
-  }, time);
-});
+  }, 60000);
+}
+emitter.on("initData", async () => {
+  // _initEachSecond(async function () {
+  const tradingSession_HOSE = TimeHelper.getTradingSession("HOSE");
+  console.log("Init data phiên", tradingSession_HOSE);
+  // const tradingSession_HNX = TimeHelper.getTradingSession("HNX");
+  // const tradingSession_UPCOM = TimeHelper.getTradingSession("UPCOM");
+  if (tradingSession_HOSE == 1) {
+    await _initOrder(orderType.buy + " ATO", 5, "HOSE");
+    await _initOrder(orderType.buy + " ATO", 6, "HOSE");
+    await _initOrder(orderType.sell + " LO", 9, "HOSE");
+    await _initOrder(orderType.sell + " LO", 8, "HOSE");
+  } else if (tradingSession_HOSE == 2) {
+    await _initOrder(orderType.buy + " ATC", 3, "HOSE");
+    await _initOrder(orderType.buy + " ATC", 4, "HOSE");
+    await _initOrder(orderType.sell + " LO", 7, "HOSE");
+    await _initOrder(orderType.sell + " LO", 9, "HOSE");
+  } else if (tradingSession_HOSE == 3) {
+    for (let i = 0; i < 50; i++) {
+      await _initOrder(orderType.buy + " MP", 1, "HOSE");
+      await _initOrder(orderType.buy + " LO", 1, "HOSE");
+      await _initOrder(orderType.sell + " MP", 1, "HOSE");
+      await _initOrder(orderType.sell + " LO", 1, "HOSE");
+    }
+  }
 
+  // if (tradingSession_HNX == 2) {
+  //   await _initOrder(orderType.buy + " ATC", 7, "HNX");
+  //   await _initOrder(orderType.buy + " ATC", 9, "HNX");
+  //   await _initOrder(orderType.sell + " LO", 5, "HNX");
+  //   await _initOrder(orderType.sell + " LO", 4, "HNX");
+  // } else if (tradingSession_HNX == 3) {
+  //   await _initOrder(orderType.buy + " MTL", 3, "HNX");
+  //   await _initOrder(orderType.buy + " LO", 7, "HNX");
+  //   await _initOrder(orderType.sell + " MTL", 1, "HNX");
+  //   await _initOrder(orderType.sell + " LO", 9, "HNX");
+  // }
+
+  // if (tradingSession_UPCOM == 3) {
+  //   await _initOrder(orderType.buy + " MP", 9, "UPCOM");
+  //   await _initOrder(orderType.buy + " LO", 8, "UPCOM");
+  //   await _initOrder(orderType.sell + " MP", 5, "UPCOM");
+  //   await _initOrder(orderType.sell + " LO", 4, "UPCOM");
+  // }
+  // });
+});
 emitter.on("MatchOrder_LO", async (params) => {
   const [stockId, gia, type] = params;
   const lenhBans = await LenhGiaoDich.find({
     maCoPhieu: stockId,
+    loaiLenh: orderType.sell + " LO",
     gia: { $lte: gia },
     createdDay: TimeHelper.getToday(),
-    loaiLenh: orderType.sell + " LO",
     khoiLuongConLai: { $ne: 0 },
     trangThai: { $ne: "đã khớp" },
   }).sort({ gia: 1, createdTime: 1, khoiLuong: 1 });
   const lenhMuas = await LenhGiaoDich.find({
     maCoPhieu: stockId,
+    loaiLenh: orderType.buy + " LO",
     gia: { $gte: gia },
     createdDay: TimeHelper.getToday(),
-    loaiLenh: orderType.buy + " LO",
     khoiLuongConLai: { $ne: 0 },
     trangThai: { $ne: "đã khớp" },
   }).sort({ gia: -1, createdTime: 1, khoiLuong: 1 });
@@ -51,25 +90,21 @@ emitter.on("MatchOrder_LO", async (params) => {
       // if (lenhBan.gia === lenhMua.gia /*&& lenhBan_id != maLenhMua*/) {
       if (lenhMua.khoiLuongConLai > 0) {
         if (lenhMua.khoiLuongConLai >= lenhBan.khoiLuongConLai) {
+          let min = Math.min(lenhMua.gia, lenhBan.gia);
           _saveGiaoDichKhop(
             stockId,
             lenhMua,
             lenhBan,
             lenhBan.khoiLuongConLai,
-            lenhMua.gia
+            min
           );
           let luongMuaConLai =
-            lenhMua.khoiLuongConLai - lenhBan.khoikhoiLuongConLaiLuong;
+            lenhMua.khoiLuongConLai - lenhBan.khoiLuongConLai;
           lenhMua.khoiLuong = luongMuaConLai;
           _capNhatLaiLenh(lenhMua, lenhBan, luongMuaConLai, 0);
         } else if (lenhMua.khoiLuongConLai < lenhBan.khoiLuongConLai) {
-          _saveGiaoDichKhop(
-            stockId,
-            lenhMua,
-            lenhBan,
-            lenhBan.khoiLuong,
-            lenhMua.khoiLuongConLai
-          );
+          let min = Math.min(lenhMua.gia, lenhBan.gia);
+          _saveGiaoDichKhop(stockId, lenhMua, lenhBan, lenhBan.khoiLuong, min);
           let luongBanConLai =
             lenhBan.khoiLuongConLai - lenhMua.khoiLuongConLai;
           _capNhatLaiLenh(lenhMua, lenhBan, 0, luongBanConLai);
@@ -123,8 +158,9 @@ emitter.on("MatchOrder_LO", async (params) => {
       }
     }
   }
-  emitter.emit("getExchangeData");
+  emitter.emit("getExchangeDataOne", stockId);
 });
+
 emitter.on("MatchOrder_MPX", async (param) => {
   const { lenhGiaoDich, res } = param;
   if (lenhGiaoDich.loaiLenh.split(" ")[0] === "mua") {
@@ -133,13 +169,19 @@ emitter.on("MatchOrder_MPX", async (param) => {
       trangThai: { $nin: ["đã hủy, khớp hoàn toàn"] },
       khoiLuongConLai: { $ne: 0 },
       createdDay: TimeHelper.getToday(),
-    }).sort({ gia: 1, createdTime: -1, khoiLuong: 1 });
+    }).sort({ gia: 1, createdTime: -1, khoiLuong: -1 });
     if (lenhBans.length === 0) {
       await LenhGiaoDich.updateOne(
         { _id: lenhGiaoDich._id },
         { trangThai: "đã hủy" }
       );
-      res.json({ status: "OK", message: "Lệnh bị hủy do không thấy đối ứng" });
+      if (res) {
+        emitter.emit("getExchangeDataOne", lenhGiaoDich.maCoPhieu);
+        res.json({
+          status: "OK",
+          message: "Lệnh bị hủy do không thấy đối ứng",
+        });
+      }
     }
     let khoiluongConLai = lenhGiaoDich.khoiLuongConLai;
     let dataKhop = [];
@@ -188,13 +230,23 @@ emitter.on("MatchOrder_MPX", async (param) => {
           { _id: lenhGiaoDich._id },
           { trangThai: "đã hủy", khoiLuongConLai: lenhGiaoDich.khoiLuong }
         );
-        return res.json({
-          status: "OK",
-          message: "Lệnh bị hủy do không được thực hiện toàn bộ",
-        });
+        emitter.emit("getExchangeDataOne", lenhGiaoDich.maCoPhieu);
+        if (res) {
+          return res.json({
+            status: "OK",
+            message: "Lệnh bị hủy do không được thực hiện toàn bộ",
+          });
+        }
       }
       for (let idLenhBan of idLenhBans) {
         let lenhBan = lenhBans.find((x) => x._id == idLenhBan);
+        await _saveGiaoDichKhop(
+          lenhGiaoDich.maCoPhieu,
+          lenhGiaoDich._id,
+          idLenhBan,
+          lenhBan.khoiLuong - lenhBan.khoiLuongConLai,
+          lenhBan.gia
+        );
         await LenhGiaoDich.updateOne(
           { _id: idLenhBan },
           {
@@ -248,10 +300,20 @@ emitter.on("MatchOrder_MPX", async (param) => {
           preId: lenhGiaoDich._id,
         });
       }
-      return res.json({ status: "OK", message: "Them thanh cong lenh!" });
+      emitter.emit("getExchangeDataOne", lenhGiaoDich.maCoPhieu);
+      if (res) {
+        return res.json({ status: "OK", message: "Them thanh cong lenh!" });
+      }
     } else {
       for (let idLenhBan of idLenhBans) {
         let lenhBan = lenhBans.find((x) => x._id == idLenhBan);
+        await _saveGiaoDichKhop(
+          lenhGiaoDich.maCoPhieu,
+          lenhGiaoDich._id,
+          idLenhBan,
+          lenhBan.khoiLuong - lenhBan.khoiLuongConLai,
+          lenhBan.gia
+        );
         await LenhGiaoDich.updateOne(
           { _id: idLenhBan },
           {
@@ -268,7 +330,10 @@ emitter.on("MatchOrder_MPX", async (param) => {
           trangThai: "khớp toàn bộ",
         }
       );
-      return res.json({ status: "OK", message: "Them thanh cong lenh!" });
+      emitter.emit("getExchangeDataOne", lenhGiaoDich.maCoPhieu);
+      if (res) {
+        return res.json({ status: "OK", message: "Them thanh cong lenh!" });
+      }
     }
   } else if (lenhGiaoDich.loaiLenh.split(" ")[0] === "bán") {
     let lenhMuas = await LenhGiaoDich.find({
@@ -276,16 +341,19 @@ emitter.on("MatchOrder_MPX", async (param) => {
       trangThai: { $nin: ["đã hủy", "khớp hoàn toàn"] },
       khoiLuongConLai: { $ne: 0 },
       createdDay: TimeHelper.getToday(),
-    }).sort({ gia: -1, createdTime: -1, khoiLuong: 1 });
+    }).sort({ gia: -1, createdTime: -1, khoiLuong: -1 });
     if (lenhMuas.length === 0) {
       await LenhGiaoDich.updateOne(
         { _id: lenhGiaoDich._id },
         { trangThai: "đã hủy" }
       );
-      return res.json({
-        status: "OK",
-        message: "Lệnh bị hủy do không thấy đối ứng",
-      });
+      emitter.emit("getExchangeDataOne", lenhGiaoDich.maCoPhieu);
+      if (res) {
+        return res.json({
+          status: "OK",
+          message: "Lệnh bị hủy do không thấy đối ứng",
+        });
+      }
     }
     let khoiluongConLai = lenhGiaoDich.khoiLuongConLai;
     let dataKhop = [];
@@ -334,13 +402,23 @@ emitter.on("MatchOrder_MPX", async (param) => {
           { _id: lenhGiaoDich._id },
           { trangThai: "đã hủy", khoiLuongConLai: lenhGiaoDich.khoiLuong }
         );
-        res.json({
-          status: "OK",
-          message: "Lệnh bị hủy do không được thực hiện toàn bộ",
-        });
+        emitter.emit("getExchangeDataOne", lenhGiaoDich.maCoPhieu);
+        if (res) {
+          res.json({
+            status: "OK",
+            message: "Lệnh bị hủy do không được thực hiện toàn bộ",
+          });
+        }
       }
       for (let idlenhMua of idlenhMuas) {
         let lenhMua = lenhMuas.find((x) => x._id == idlenhMua);
+        await _saveGiaoDichKhop(
+          lenhGiaoDich.maCoPhieu,
+          idlenhMua,
+          lenhGiaoDich._id,
+          lenhMua.khoiLuong - lenhMua.khoiLuongConLai,
+          lenhMua.gia
+        );
         await LenhGiaoDich.updateOne(
           { _id: idlenhMua },
           {
@@ -394,10 +472,20 @@ emitter.on("MatchOrder_MPX", async (param) => {
           preId: lenhGiaoDich._id,
         });
       }
-      return res.json({ status: "OK", message: "Them thanh cong lenh!" });
+      if (res) {
+        emitter.emit("getExchangeDataOne", lenhGiaoDich.maCoPhieu);
+        return res.json({ status: "OK", message: "Them thanh cong lenh!" });
+      }
     } else {
       for (let idlenhMua of idlenhMuas) {
         let lenhMua = lenhMuas.find((x) => x._id == idlenhMua);
+        await _saveGiaoDichKhop(
+          lenhGiaoDich.maCoPhieu,
+          idlenhMua,
+          lenhGiaoDich._id,
+          lenhMua.khoiLuong - lenhMua.khoiLuongConLai,
+          lenhMua.gia
+        );
         await LenhGiaoDich.updateOne(
           { _id: idlenhMua },
           {
@@ -414,17 +502,21 @@ emitter.on("MatchOrder_MPX", async (param) => {
           trangThai: "khớp toàn bộ",
         }
       );
-      return res.json({ status: "OK", message: "Them thanh cong lenh!" });
+      emitter.emit("getExchangeDataOne", lenhGiaoDich.maCoPhieu);
+      if (res) {
+        return res.json({ status: "OK", message: "Them thanh cong lenh!" });
+      }
     }
   }
-  emitter.emit("getExchangeData");
-});
-emitter.on("getExchangeData", async function () {
-  let stocksData = await _getStockData();
-  // let stocksData = await _returnStocks();
-  emitter.emit("returnExchangeData", stocksData);
 });
 
+emitter.on("getExchangeData", async function () {
+  let stocksData_HOSE = await _getStockData("HOSE");
+  let stocksData_HNX = await _getStockData("HNX");
+  let stocksData_UPCOM = await _getStockData("UPCOM");
+  let stocksData = [...stocksData_HOSE, ...stocksData_HNX, ...stocksData_UPCOM];
+  emitter.emit("returnExchangeData", stocksData);
+});
 let _saveGiaoDichKhop = async function (
   maCoPhieu,
   lenhMua,
@@ -441,7 +533,6 @@ let _saveGiaoDichKhop = async function (
   });
   await giaoDichKhop.save();
 };
-
 let _capNhatLaiLenh = async function (
   lenhMua,
   lenhBan,
@@ -459,16 +550,19 @@ let _capNhatLaiLenh = async function (
     trangThai: trangThaiBan,
   }).catch((err) => console.log(err));
 };
-
-let _getStockData = async function () {
+let _getStockData = async function (exchange) {
   // get stockdata phiên định kỳ
-  if (1 == 1) {
+  if (
+    TimeHelper.getTradingSession(exchange) == 1 ||
+    TimeHelper.getTradingSession(exchange) == 2
+  ) {
     let stocksData = [];
-    let coPhieuAll = await CoPhieu.find();
+    let coPhieuAll = await CoPhieu.find({ maSan: exchange });
     let muaATxAll = await LenhGiaoDich.aggregate([
       {
         $match: {
           createdDay: TimeHelper.getToday(),
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
           loaiLenh: { $in: ["mua ATC", "mua ATO"] },
           trangThai: "đã xác nhận",
         },
@@ -500,6 +594,7 @@ let _getStockData = async function () {
       {
         $match: {
           createdDay: TimeHelper.getToday(),
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
           loaiLenh: { $in: ["bán ATC", "bán ATO"] },
           trangThai: "đã xác nhận",
         },
@@ -529,6 +624,7 @@ let _getStockData = async function () {
       {
         $match: {
           createdDay: TimeHelper.getToday(),
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
           loaiLenh: orderType.buy + " LO",
           trangThai: "đã xác nhận",
         },
@@ -561,6 +657,7 @@ let _getStockData = async function () {
       {
         $match: {
           createdDay: TimeHelper.getToday(),
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
           loaiLenh: orderType.sell + " LO",
           trangThai: "đã xác nhận",
         },
@@ -590,6 +687,7 @@ let _getStockData = async function () {
       {
         $match: {
           createdDay: TimeHelper.getToday(),
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
         },
       },
       {
@@ -617,13 +715,18 @@ let _getStockData = async function () {
       {
         $match: {
           createdDay: TimeHelper.getToday(),
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
         },
       },
       {
         $group: {
           _id: { createdDay: "$createdDay", maCoPhieu: "$maCoPhieu" },
           tongKL: { $sum: "$khoiLuong" },
-          tongGT: { $sum: { $multiply: ["$khoiLuong", "$gia"] } },
+          tongGT: {
+            $sum: {
+              $multiply: ["$khoiLuong", { $toDouble: "$gia" }],
+            },
+          },
         },
       },
       {
@@ -698,8 +801,12 @@ let _getStockData = async function () {
       let top1Khop = top1KhopAll
         .filter((x) => x.maCoPhieu == stockId)
         .slice(0, 1);
-      stockData.match = top1Khop[0] ? top1Khop[0].gia : "";
-      stockData.mVol = top1Khop[0] ? top1Khop[0].tongKhoiLuong : "";
+      let dsGiaKhop = await GiaHelper.dsGiaKhop(
+        exchange,
+        TimeHelper.getTradingSession(exchange) == 1
+      );
+      stockData.match = dsGiaKhop[stockId] ? dsGiaKhop[stockId] : "";
+      stockData.mVol = "";
 
       let tongKhop = tongKhopAll
         .filter((x) => x.maCoPhieu == stockId)
@@ -711,14 +818,15 @@ let _getStockData = async function () {
     return stocksData;
   }
   // get stocks Data phiên liên tục
-  else if (1 != 1) {
+  else if (TimeHelper.getTradingSession(exchange) == 3) {
     let stocksData = [];
-    let coPhieuAll = await CoPhieu.find();
+    let coPhieuAll = await CoPhieu.find({ maSan: exchange });
     let top3MuaAll = await LenhGiaoDich.aggregate([
       {
         $match: {
           createdDay: TimeHelper.getToday(),
-          loaiLenh: orderType.buy + " LO",
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
+          loaiLenh: "mua LO",
         },
       },
       {
@@ -749,6 +857,7 @@ let _getStockData = async function () {
       {
         $match: {
           createdDay: TimeHelper.getToday(),
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
           loaiLenh: orderType.sell + " LO",
         },
       },
@@ -777,28 +886,10 @@ let _getStockData = async function () {
       {
         $match: {
           createdDay: TimeHelper.getToday(),
+          maCoPhieu: { $in: coPhieuAll.map((x) => x._id) },
         },
       },
-      {
-        $group: {
-          _id: { gia: "$gia", maCoPhieu: "$maCoPhieu" },
-          tongKhoiLuong: { $sum: "$khoiLuong" },
-        },
-      },
-      {
-        $match: {
-          tongKhoiLuong: { $ne: 0 },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          gia: "$_id.gia",
-          maCoPhieu: "$_id.maCoPhieu",
-          tongKhoiLuong: 1,
-        },
-      },
-      { $sort: { matchedTime: 1 } },
+      { $sort: { matchedTime: -1 } },
     ]);
     let tongKhopAll = await GiaoDichKhop.aggregate([
       {
@@ -810,7 +901,9 @@ let _getStockData = async function () {
         $group: {
           _id: { createdDay: "$createdDay", maCoPhieu: "$maCoPhieu" },
           tongKL: { $sum: "$khoiLuong" },
-          tongGT: { $sum: { $multiply: ["$khoiLuong", "$gia"] } },
+          tongGT: {
+            $sum: { $multiply: ["$khoiLuong", { $toDouble: "$gia" }] },
+          },
         },
       },
       {
@@ -831,7 +924,7 @@ let _getStockData = async function () {
       stockData.ceiling = coPhieu.giaTran;
       stockData.floor = coPhieu.giaSan;
       stockData.reference = coPhieu.giaThamChieu;
-
+      stockData.exchange = coPhieu.maSan;
       let top3Mua = top3MuaAll
         .filter((x) => x.maCoPhieu == stockId)
         .slice(0, 3);
@@ -856,7 +949,7 @@ let _getStockData = async function () {
         .filter((x) => x.maCoPhieu == stockId)
         .slice(0, 1);
       stockData.match = top1Khop[0] ? top1Khop[0].gia : "";
-      stockData.mVol = top1Khop[0] ? top1Khop[0].tongKhoiLuong : "";
+      stockData.mVol = top1Khop[0] ? top1Khop[0].khoiLuong : "";
 
       let tongKhop = tongKhopAll
         .filter((x) => x.maCoPhieu == stockId)
@@ -866,13 +959,25 @@ let _getStockData = async function () {
       stocksData.push(stockData);
     }
     return stocksData;
+  } else {
+    let stocksData = [];
+    let coPhieuAll = await CoPhieu.find({ maSan: exchange });
+    for (let coPhieu of coPhieuAll) {
+      let stockData = {};
+      let stockId = coPhieu._id;
+      stockData.symbol = coPhieu._id;
+      stockData.ceiling = coPhieu.giaTran;
+      stockData.floor = coPhieu.giaSan;
+      stockData.reference = coPhieu.giaThamChieu;
+      stockData.exchange = coPhieu.maSan;
+      stocksData.push(stockData);
+    }
+    return stocksData;
   }
 };
-
-let _initOrder = async (type, size) => {
-  const taiKhoan = await TaiKhoan.findOne({ tenDangNhap: "Creator" });
-  const maTaiKhoan = taiKhoan._id;
-  const stocksList = await CoPhieu.find();
+let _initOrder = async (type, size, exchange) => {
+  const maTaiKhoan = ["29A000001", "29A000002", "29A000003"];
+  const stocksList = await CoPhieu.find({ maSan: exchange });
   const khoiLuong = [1000, 1500, 2000, 2500, 3000];
   let timestamp = Date.now();
   for (let i = 0; i < size; i++) {
@@ -882,19 +987,399 @@ let _initOrder = async (type, size) => {
       stocksList[stockPosition].giaTran,
       stocksList[stockPosition].giaSan
     );
-    const coPhieu = new LenhGiaoDich({
-      maTaiKhoan: maTaiKhoan,
+    let khoiLuongRnd =
+      khoiLuong[Math.round(Math.random() * (khoiLuong.length - 1))];
+    let maTaiKhoanRnd =
+      maTaiKhoan[Math.round(Math.random() * (maTaiKhoan.length - 1))];
+
+    const lenhGiaoDich = new LenhGiaoDich({
+      maTaiKhoan: maTaiKhoanRnd,
       maCoPhieu: stockId,
       loaiLenh: type,
-      khoiLuong: khoiLuong[Math.round(Math.random() * (khoiLuong.length - 1))],
+      khoiLuong: khoiLuongRnd,
+      khoiLuongConLai: khoiLuongRnd,
       gia: gia,
       trangThai: "đã xác nhận",
       createdDay: TimeHelper.getToday(),
       createdTime: timestamp,
     });
-    var next = await coPhieu.save();
-    if (next) emitter.emit("MatchOrder", [stockId, gia, type]);
+    try {
+      let result = await lenhGiaoDich.save();
+      //neu la phien lien tuc thi moi match order
+      const tradingSession = TimeHelper.getTradingSession(exchange);
+      if (tradingSession == 1 || tradingSession == 2) {
+        emitter.emit("getExchangeDataOne", stockId);
+      } else if (tradingSession == 3) {
+        if (type.split(" ")[1] == "LO") {
+          emitter.emit("MatchOrder_LO", [stockId, gia, type]);
+        } else
+          emitter.emit("MatchOrder_MPX", {
+            lenhGiaoDich: result,
+          });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 };
 
+emitter.on("getExchangeDataOne", async function (symbol) {
+  let stockData = await _getStockDataOne(symbol);
+  emitter.emit("returnExchangeDataOne", stockData);
+});
+
+let _getStockDataOne = async function (symbol) {
+  // get stockdata phiên định kỳ
+  let coPhieu = await CoPhieu.findOne({ _id: symbol });
+  let exchange = coPhieu.maSan;
+  if (
+    TimeHelper.getTradingSession(exchange) == 1 ||
+    TimeHelper.getTradingSession(exchange) == 2
+  ) {
+    let stockData = {};
+    let muaATx = await LenhGiaoDich.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+          loaiLenh: { $in: ["mua ATC", "mua ATO"] },
+          trangThai: "đã xác nhận",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            gia: "$gia",
+          },
+          tongKhoiLuong: { $sum: "$khoiLuongConLai" },
+        },
+      },
+      {
+        $match: {
+          tongKhoiLuong: { $ne: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          gia: "$_id.gia",
+          tongKhoiLuong: 1,
+        },
+      },
+    ]);
+    let banATx = await LenhGiaoDich.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+          loaiLenh: { $in: ["bán ATC", "bán ATO"] },
+          trangThai: "đã xác nhận",
+        },
+      },
+      {
+        $group: {
+          _id: { gia: "$gia" },
+          tongKhoiLuong: { $sum: "$khoiLuongConLai" },
+        },
+      },
+      {
+        $match: {
+          tongKhoiLuong: { $ne: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          gia: "$_id.gia",
+          tongKhoiLuong: 1,
+        },
+      },
+      { $sort: { gia: 1 } },
+    ]);
+    let top3MuaAll = await LenhGiaoDich.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+          loaiLenh: orderType.buy + " LO",
+          trangThai: "đã xác nhận",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            gia: "$gia",
+          },
+          tongKhoiLuong: { $sum: "$khoiLuongConLai" },
+        },
+      },
+      {
+        $match: {
+          tongKhoiLuong: { $ne: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          gia: "$_id.gia",
+          tongKhoiLuong: 1,
+        },
+      },
+      { $sort: { gia: -1 } },
+    ]);
+    let top3BanAll = await LenhGiaoDich.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+          loaiLenh: orderType.sell + " LO",
+          trangThai: "đã xác nhận",
+        },
+      },
+      {
+        $group: {
+          _id: { gia: "$gia" },
+          tongKhoiLuong: { $sum: "$khoiLuongConLai" },
+        },
+      },
+      {
+        $match: {
+          tongKhoiLuong: { $ne: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          gia: "$_id.gia",
+          tongKhoiLuong: 1,
+        },
+      },
+      { $sort: { gia: 1 } },
+    ]);
+    let tongKhopAll = await GiaoDichKhop.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+        },
+      },
+      {
+        $group: {
+          _id: { createdDay: "$createdDay" },
+          tongKL: { $sum: "$khoiLuong" },
+          tongGT: {
+            $sum: { $multiply: ["$khoiLuong", { $toDouble: "$gia" }] },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          tongKL: 1,
+          tongGT: 1,
+        },
+      },
+      { $match: { tongKL: { $ne: 0 }, tongGT: { $ne: 0 } } },
+    ]);
+    stockData.symbol = coPhieu._id;
+    stockData.ceiling = coPhieu.giaTran;
+    stockData.floor = coPhieu.giaSan;
+    stockData.reference = coPhieu.giaThamChieu;
+    stockData.exchange = coPhieu.maSan;
+    stockData.buy_3 = muaATx[0] ? muaATx[0].gia : "";
+    stockData.bVol_3 = muaATx[0] ? muaATx[0].tongKhoiLuong : "";
+    let top3Mua = top3MuaAll.slice(0, 3);
+
+    if (!stockData.buy_3) {
+      stockData.buy_3 = top3Mua[0] ? top3Mua[0].gia : "";
+      stockData.buy_2 = top3Mua[1] ? top3Mua[1].gia : "";
+      stockData.buy_1 = top3Mua[2] ? top3Mua[2].gia : "";
+    } else {
+      stockData.buy_2 = top3Mua[0] ? top3Mua[0].gia : "";
+      stockData.buy_1 = top3Mua[1] ? top3Mua[1].gia : "";
+    }
+
+    if (!stockData.bVol_3) {
+      stockData.bVol_3 = top3Mua[0] ? top3Mua[0].tongKhoiLuong : "";
+      stockData.bVol_2 = top3Mua[1] ? top3Mua[1].tongKhoiLuong : "";
+      stockData.bVol_1 = top3Mua[2] ? top3Mua[2].tongKhoiLuong : "";
+    } else {
+      stockData.bVol_2 = top3Mua[0] ? top3Mua[0].tongKhoiLuong : "";
+      stockData.bVol_1 = top3Mua[1] ? top3Mua[1].tongKhoiLuong : "";
+    }
+
+    stockData.sell_1 = banATx[0] ? banATx[0].gia : "";
+    stockData.sVol_1 = banATx[0] ? banATx[0].tongKhoiLuong : "";
+    let top3Ban = top3BanAll.slice(0, 3);
+
+    if (!stockData.sell_1) {
+      stockData.sell_1 = top3Ban[0] ? top3Ban[0].gia : "";
+      stockData.sell_2 = top3Ban[1] ? top3Ban[1].gia : "";
+      stockData.sell_3 = top3Ban[2] ? top3Ban[2].gia : "";
+    } else {
+      stockData.sell_2 = top3Ban[0] ? top3Ban[0].gia : "";
+      stockData.sell_3 = top3Ban[1] ? top3Ban[1].gia : "";
+    }
+
+    if (!stockData.sVol_1) {
+      stockData.sVol_1 = top3Ban[0] ? top3Ban[0].tongKhoiLuong : "";
+      stockData.sVol_2 = top3Ban[1] ? top3Ban[1].tongKhoiLuong : "";
+      stockData.sVol_3 = top3Ban[2] ? top3Ban[2].tongKhoiLuong : "";
+    } else {
+      stockData.sVol_2 = top3Ban[0] ? top3Ban[0].tongKhoiLuong : "";
+      stockData.sVol_3 = top3Ban[1] ? top3Ban[1].tongKhoiLuong : "";
+    }
+    let dsGiaKhop = await GiaHelper.dsGiaKhop(
+      exchange,
+      TimeHelper.getTradingSession(exchange) == 1
+    );
+    stockData.match = dsGiaKhop[symbol] ? dsGiaKhop[symbol] : "";
+    stockData.mVol = "";
+    let tongKhop = tongKhopAll
+      .filter((x) => x.maCoPhieu == stockId)
+      .slice(0, 1);
+    stockData.totalVal = tongKhop[0] ? tongKhop[0].tongGT : "";
+    stockData.totalVol = tongKhop[0] ? tongKhop[0].tongKL : "";
+    return stockData;
+  }
+  // get stocks Data phiên liên tục
+  else if (TimeHelper.getTradingSession(exchange) == 3) {
+    let top3MuaAll = await LenhGiaoDich.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+          loaiLenh: "mua LO",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            gia: "$gia",
+          },
+          tongKhoiLuong: { $sum: "$khoiLuongConLai" },
+        },
+      },
+      {
+        $match: {
+          tongKhoiLuong: { $ne: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          gia: "$_id.gia",
+          tongKhoiLuong: 1,
+        },
+      },
+      { $sort: { gia: -1 } },
+    ]);
+    let top3BanAll = await LenhGiaoDich.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+          loaiLenh: orderType.sell + " LO",
+        },
+      },
+      {
+        $group: {
+          _id: { gia: "$gia" },
+          tongKhoiLuong: { $sum: "$khoiLuongConLai" },
+        },
+      },
+      {
+        $match: {
+          tongKhoiLuong: { $ne: 0 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          gia: "$_id.gia",
+          tongKhoiLuong: 1,
+        },
+      },
+      { $sort: { gia: 1 } },
+    ]);
+    let top1KhopAll = await GiaoDichKhop.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+        },
+      },
+      { $sort: { matchedTime: -1 } },
+    ]);
+    let tongKhopAll = await GiaoDichKhop.aggregate([
+      {
+        $match: {
+          createdDay: TimeHelper.getToday(),
+          maCoPhieu: symbol,
+        },
+      },
+      {
+        $group: {
+          _id: { createdDay: "$createdDay" },
+          tongKL: { $sum: "$khoiLuong" },
+          tongGT: {
+            $sum: {
+              $multiply: ["$khoiLuong", { $toDouble: "$gia" }],
+            },
+          },
+        },
+      },
+      // {
+      //   $project: {
+      //     _id: 0,
+      //     tongKL: 1,
+      //     tongGT: 1,
+      //   },
+      // },
+      // { $match: { tongKL: { $ne: 0 }, tongGT: { $ne: 0 } } },
+    ]);
+    console.log("tongKhopAll", tongKhopAll);
+    let stockData = {};
+    let stockId = coPhieu._id;
+    stockData.symbol = coPhieu._id;
+    stockData.ceiling = coPhieu.giaTran;
+    stockData.floor = coPhieu.giaSan;
+    stockData.reference = coPhieu.giaThamChieu;
+    stockData.exchange = coPhieu.maSan;
+    let top3Mua = top3MuaAll.slice(0, 3);
+    stockData.buy_3 = top3Mua[0] ? top3Mua[0].gia : "";
+    stockData.buy_2 = top3Mua[1] ? top3Mua[1].gia : "";
+    stockData.buy_1 = top3Mua[2] ? top3Mua[2].gia : "";
+    stockData.bVol_3 = top3Mua[0] ? top3Mua[0].tongKhoiLuong : "";
+    stockData.bVol_2 = top3Mua[1] ? top3Mua[1].tongKhoiLuong : "";
+    stockData.bVol_1 = top3Mua[2] ? top3Mua[2].tongKhoiLuong : "";
+
+    let top3Ban = top3BanAll.slice(0, 3);
+    stockData.sell_1 = top3Ban[0] ? top3Ban[0].gia : "";
+    stockData.sell_2 = top3Ban[1] ? top3Ban[1].gia : "";
+    stockData.sell_3 = top3Ban[2] ? top3Ban[2].gia : "";
+    stockData.sVol_1 = top3Ban[0] ? top3Ban[0].tongKhoiLuong : "";
+    stockData.sVol_2 = top3Ban[1] ? top3Ban[1].tongKhoiLuong : "";
+    stockData.sVol_3 = top3Ban[2] ? top3Ban[2].tongKhoiLuong : "";
+
+    let top1Khop = top1KhopAll
+      .filter((x) => x.maCoPhieu == stockId)
+      .slice(0, 1);
+    stockData.match = top1Khop[0] ? top1Khop[0].gia : "";
+    stockData.mVol = top1Khop[0] ? top1Khop[0].khoiLuong : "";
+
+    let tongKhop = tongKhopAll;
+    stockData.totalVal = tongKhop[0] ? tongKhop[0].tongGT : "";
+    stockData.totalVol = tongKhop[0] ? tongKhop[0].tongKL : "";
+    return stockData;
+  } else {
+    let stockData = {};
+    stockData.symbol = coPhieu._id;
+    stockData.ceiling = coPhieu.giaTran;
+    stockData.floor = coPhieu.giaSan;
+    stockData.reference = coPhieu.giaThamChieu;
+    stockData.exchange = coPhieu.maSan;
+    return stockData;
+  }
+};
 module.exports = emitter;

@@ -1,41 +1,43 @@
+import { demo } from "../constants";
 export function getOrderTypes(exchange) {
   switch (exchange) {
     case "HOSE":
       if (getTradingSession("HOSE") === -1 || getTradingSession("HOSE") === 0)
-        return ["Không có lệnh phù hợp"];
-      else if (getTradingSession("HOSE") === 1) return ["ATO", "LO"];
-      else if (getTradingSession("HOSE") === 2) return ["ATC", "LO"];
-      else if (getTradingSession("HOSE") === 3) return ["MP", "LO"];
+        return ["Chưa chọn lệnh","Không có lệnh phù hợp"];
+      else if (getTradingSession("HOSE") === 1) return ["Chưa chọn lệnh","ATO", "LO"];
+      else if (getTradingSession("HOSE") === 2) return ["Chưa chọn lệnh","ATC", "LO"];
+      else if (getTradingSession("HOSE") === 3) return ["Chưa chọn lệnh","MP", "LO"];
       break;
     case "HNX":
       if (getTradingSession("HNX") === -1 || getTradingSession("HNX") === 0)
-        return ["Không có lệnh phù hợp"];
-      else if (getTradingSession("HNX") === 2) return ["ATC", "LO"];
+        return ["Chưa chọn lệnh","Không có lệnh phù hợp"];
+      else if (getTradingSession("HNX") === 2) return ["Chưa chọn lệnh","ATC", "LO"];
       else if (getTradingSession("HNX") === 3)
-        return ["MAK", "MOK", "MTL", "LO"];
-      else if (getTradingSession("HNX") === 4) return ["PLO", "LO"];
+        return ["Chưa chọn lệnh","MAK", "MOK", "MTL", "LO"];
+      else if (getTradingSession("HNX") === 4) return ["Chưa chọn lệnh","PLO", "LO"];
       break;
     case "UPCOM":
       if (getTradingSession("UPCOM") === -1 || getTradingSession("UPCOM") === 0)
-        return ["Không có lệnh phù hợp"];
-      else if (getTradingSession("UPCOM") === 3) return ["LO"];
+        return ["Chưa chọn lệnh","Không có lệnh phù hợp"];
+      else if (getTradingSession("UPCOM") === 3) return ["Chưa chọn lệnh","LO"];
       break;
-
     default:
-      return ["Không có lệnh phù hợp"];
+      return ["Chưa chọn lệnh","Không có lệnh phù hợp"];
       break;
   }
 }
-  /**
-   * return
-   * 0: Phiên nghỉ
-   * 1: Phiên định kỳ mở
-   * 2: Phiên định kỳ đóng
-   * 3: Phiên liên tục
-   * 4: Phiên sau giờ
-   * -1: nothing
-   */
-  function getTradingSession(exchange) {
+/**
+ * return
+ * 0: Phiên nghỉ
+ * 1: Phiên định kỳ mở
+ * 2: Phiên định kỳ đóng
+ * 3: Phiên liên tục
+ * 4: Phiên sau giờ
+ * -1: nothing
+ */
+function getTradingSession(exchange) {
+  if (demo) return window.phien;
+  else {
     const now = new Date();
     const timeNow = now.getTime();
     const start_DinhKy_Mo = new Date(
@@ -152,3 +154,4 @@ export function getOrderTypes(exchange) {
       return 4;
     } else return -1;
   }
+}

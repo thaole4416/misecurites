@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { emitter } from "../../emitter";
 import { getOrderTypes } from "../../helpers/orderTypes";
+import ReCAPTCHA from "react-google-recaptcha";
 class OrderPopup extends Component {
   constructor(props) {
     super(props);
@@ -28,8 +29,11 @@ class OrderPopup extends Component {
         value: "",
         errors: [],
       },
-      type: "Không có lệnh phù hợp",
+      type: "",
+      recaptcha: "",
+      isBuy : false
     };
+    this.recaptchaRef = React.createRef();
   }
 
   listenEvent = () => {
@@ -56,8 +60,31 @@ class OrderPopup extends Component {
           value: "",
           errors: [],
         },
-        type: "Không có lệnh phù hợp",
+        type: "",
       });
+    });
+    emitter.on(`orderSuccess`, () => {
+      this.recaptchaRef.current.reset();
+    });
+    emitter.on(`orderFail`, (message) => {
+      this.recaptchaRef.current.reset();
+    });
+    emitter.on("danhMuctoOrder", (param) => {
+      const { symbol, isBuy , gia = "", khoiLuong = "" } = param;
+      this.state.symbol.value = symbol;
+      this.state.price.value = gia;
+      this.state.volume.value = khoiLuong;
+      this.state.isBuy = isBuy;
+      const orderStock = this.props.allStocks.find(
+        (stock) => stock._id === symbol
+      );
+      if (orderStock) {
+        this.state.orderStock.value.ceiling = orderStock.giaTran;
+        this.state.orderStock.value.floor = orderStock.giaSan;
+        this.state.orderStock.value.reference = orderStock.giaThamChieu;
+        this.state.orderStock.value.exchange = orderStock.maSan;
+      }
+      this.setState({ ...this.state });
     });
   };
 
@@ -174,7 +201,7 @@ class OrderPopup extends Component {
     Object.values(this.state).forEach((state) => {
       if (typeof state == "object" && state.errors.length != 0) count++;
     });
-    if (!count )
+    if (!count)
       this.props.callback({
         token: this.props.user.token,
         maCoPhieu: symbol.value,
@@ -182,6 +209,7 @@ class OrderPopup extends Component {
         khoiLuong: volume.value,
         gia: price.value,
         maSan: orderStock.value.exchange,
+        captcha: this.recaptchaRef.current.getValue(),
       });
     else {
       event.preventDefault();
@@ -198,15 +226,16 @@ class OrderPopup extends Component {
     return (
       <div className="orderPopup popup" style={{ padding: 15, paddingTop: 0 }}>
         <hr />
-        <input
+        {/* <input
           type="checkbox"
-          checked
           data-toggle="toggle"
           data-on="Mua"
           data-off="Bán"
           data-onstyle="success"
           data-offstyle="danger"
-        />
+          ref = {this.toggleRef}
+        /> */}
+        <button className={this.state.isBuy ?  "toggle btn btn-danger" :"toggle btn btn-success"} onClick={()=> this.setState({isBuy : !this.state.isBuy})}>{this.state.isBuy ? "Bán" : "Mua"}</button>
         <hr />
         <div class="form-group">
           <input
@@ -274,21 +303,32 @@ class OrderPopup extends Component {
                 onChange={this.changeType}
               >
                 {getOrderTypes(orderStock.value.exchange).map((type) => (
-                  <option value={type}>{type}</option>
+                  <option value={type} >{type}</option>
                 ))}
               </select>
             </div>
           </div>
         </div>
         <hr />
-        <div
+        {/* <div
           class="g-recaptcha"
-          data-sitekey="6LdNJgEVAAAAAFNDROJEpsDbd8jtRdsHqw66_Sjw"
-        >
-        </div>
+          data-sitekey="6LcLKwEVAAAAAGJpBc6qEdBHMdgJRARWJx_NIkP0"
+        ></div> */}
+        <ReCAPTCHA
+          sitekey="6LcLKwEVAAAAAGJpBc6qEdBHMdgJRARWJx_NIkP0"
+          ref={this.recaptchaRef}
+          onChange={() =>
+            this.setState({
+              captcha: this.recaptchaRef.current
+                ? this.recaptchaRef.current.getValue()
+                : null,
+            })
+          }
+        />
         <button
-          className="btn btn-block button disable"
+          className="btn btn-block button"
           onClick={this.handleSubmit}
+          disabled={symbol.value ? (this.state.captcha ? false : true) : true}
         >
           Đặt lệnh
         </button>
@@ -297,13 +337,14 @@ class OrderPopup extends Component {
   }
 }
 
-const mapStateToProps = ({ allStocks, user }) => ({
+const mapStateToProps = ({ allStocks, user, symbol }) => ({
   allStocks: allStocks,
   user: user,
+  symbol: symbol,
 });
 
 // const mapDispatchToProps = (dispatch) => ({
-//   order: (payload) => dispatch(order(payload)),
+//   checkSymbol: (payload) => dispatch(checkSymbol(payload)),
 // });
 
 export default connect(mapStateToProps, null)(OrderPopup);

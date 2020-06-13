@@ -9,7 +9,6 @@ class DanhMuc extends Component {
   }
 
   render() {
-    console.log(this.props.danhMuc)
     return (
       <div className="danhMuc popup">
         <hr />
@@ -48,8 +47,8 @@ class DanhMuc extends Component {
                     <span>{danhMuc.choVe}</span>
                   </td>
                   <td className={`td`} style={{ textAlign: "center" }}>
-                    <span className="bg-success p-2">Mua</span>&nbsp;
-                    <span className="bg-danger p-2">Bán</span>
+                    <span className="text-success p-2" onClick={() => this.props.checkSymbol(danhMuc.maCoPhieu,false)}>Mua</span>&nbsp;
+                    <span className="text-danger p-2" onClick={() => this.props.checkSymbol(danhMuc.maCoPhieu,true)}>Bán</span>
                   </td>
                 </tr>
               ))}

@@ -1,7 +1,7 @@
 import { takeEvery } from "redux-saga/effects";
 import { getAllStocksSaga, getHistorySaga } from "./stocksSaga";
 import { loginSaga, getDanhMucSaga, getInfoSaga, registerSaga,changePasswordSaga } from "./userSaga";
-import { orderSaga } from "./orderSaga";
+import { orderSaga, editOrderSaga, cancelOrderSaga } from "./orderSaga";
 import { genOtpSaga, verifyOtpSaga } from "./otpSaga";
 
 function* rootSaga() {
@@ -15,6 +15,8 @@ function* rootSaga() {
   yield takeEvery("LICH_SU", getHistorySaga);
   yield takeEvery("THONG_TIN", getInfoSaga);
   yield takeEvery("CHANGE_PASSWORD", changePasswordSaga);
+  yield takeEvery("EDIT", editOrderSaga);
+  yield takeEvery("CANCEL", cancelOrderSaga);
 }
 
 export default rootSaga;

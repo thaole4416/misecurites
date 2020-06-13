@@ -10,6 +10,7 @@ const app = express();
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
 const port = process.env.SERVER_PORT || 5000;
+const TimeHelper = require("./helpers/time")
 app.use(cors());
 app.options("*", cors());
 app.use(express.json());
@@ -18,13 +19,18 @@ require("./database");
 require("./helpers/MatchOrder");
 
 app.use("/api", routes);
-emitter.emit("initData");
+
+global.phien = -1;
+// TimeHelper.excuteCodeAtTime(()=>emitter.emit("initData"),{ hour: 9, minute: 0, second: 0, milisecond: 0 })
+// emitter.emit("initData")
+//khop dinh ky
+
 io.on("connection", function (socket) {
-  socket.on("initData", () => {
-    emitter.emit("initData");
-  });
   emitter.on("returnExchangeData", (stocksData) => {
     socket.emit("getStocks",stocksData)
+  });
+  emitter.on("returnExchangeDataOne", (stockData) => {
+    socket.emit("getStock",stockData)
   });
   socket.on("getExchangeData", function () {
     emitter.emit("getExchangeData");

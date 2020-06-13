@@ -41,6 +41,7 @@ export const order = async (action) => {
       khoiLuong: action.payload.khoiLuong,
       gia: action.payload.gia,
       maSan: action.payload.maSan,
+      captcha: action.payload.captcha
     },
   });
   return response.data;
@@ -54,6 +55,43 @@ export const getHistory = async (action) => {
       "Access-Control-Allow-Origin": "*",
       "Content-Type": "application/json",
       Authorization: `Bearer ${action.payload}`,
+    },
+  });
+  return response.data;
+};
+
+export const edit = async (action) => {
+  let response = await axios({
+    method: "post",
+    url: BASE_URL + "/lenhGiaoDich",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${action.payload.token}`,
+    },
+    data: {
+      maCoPhieu: action.payload.maCoPhieu,
+      maLenh: action.payload.maLenh,
+      khoiLuongSua: action.payload.khoiLuongSua,
+      khoiLuong: action.payload.khoiLuong,
+      giaSua: action.payload.giaSua,
+      gia: action.payload.gia,
+    },
+  });
+  return response.data;
+};
+
+export const cancel = async (action) => {
+  let response = await axios({
+    method: "post",
+    url: BASE_URL + "/lenhGiaoDich/cancel",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${action.payload.token}`,
+    },
+    data: {
+      maLenh: action.payload.maLenh,
     },
   });
   return response.data;

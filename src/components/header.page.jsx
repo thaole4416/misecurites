@@ -3,6 +3,8 @@ import LoginPopup from "./popup/login.popup";
 import RegisterPopup from "./popup/register.popup";
 import InfoPopup from "./popup/info.popup";
 import ChangePasswordPopup from "./popup/passwordChange.popup";
+import axios from "axios";
+import { BASE_URL } from "../constants";
 import SkyLight from "react-skylight";
 import {
   login,
@@ -22,15 +24,17 @@ import Clock from "./clock";
 import { getCookie } from "../helpers/cookies";
 import { emitter } from "../emitter";
 import OtpPopup from "./popup/otp.popup";
-
+import Draggable from "react-draggable";
 class Header extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      activeDrags: 0,
       showUserMenu: false,
+      showDemo: false,
       registerErrors: [],
-      password: {}
+      password: {},
     };
   }
 
@@ -40,11 +44,11 @@ class Header extends Component {
   };
 
   listenEvent = () => {
-    emitter.on("loginSuccess", () =>{
-       toast.success("Đăng nhập thành công")
-       this.props.getThongTin(this.props.user.token);
-       this.props.getDanhMuc(this.props.user.token);
-      });
+    emitter.on("loginSuccess", () => {
+      toast.success("Đăng nhập thành công");
+      this.props.getThongTin(this.props.user.token);
+      this.props.getDanhMuc(this.props.user.token);
+    });
     emitter.on("loginFail", () => toast.error("Đăng nhập thất bại"));
     emitter.on("registerSuccess", () => {
       this.registerPopup.hide();
@@ -55,13 +59,17 @@ class Header extends Component {
       toast.error("Đăng ký thất bại");
     });
     emitter.on(`verifySuccess1`, () => {
-      this.props.changePassword({token: this.props.user.token, password: this.state.password.password, newPassword: this.state.password.newPassword});
+      this.props.changePassword({
+        token: this.props.user.token,
+        password: this.state.password.password,
+        newPassword: this.state.password.newPassword,
+      });
     });
     emitter.on(`changePasswordSuccess`, () => {
-      toast.success("Đổi mật khẩu thành công")
+      toast.success("Đổi mật khẩu thành công");
     });
     emitter.on(`changePasswordFail`, (message) => {
-      toast.error(message)
+      toast.error(message);
     });
   };
 
@@ -107,14 +115,74 @@ class Header extends Component {
     // this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this.listenEvent();
     this.props.getAllStocks();
     if (this.props.user || getCookie("userInfo")) {
       this.props.getThongTin(this.props.user.token);
       this.props.getDanhMuc(this.props.user.token);
     }
+    let result = await axios({
+      method: "get",
+      url: BASE_URL + "/demo/phien",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    });
+    window.phien = result.data;
+    this.setState({ phien: result.data });
   }
+
+  setPhien = async (phien) => {
+    this.setState({ phien: phien });
+    await axios({
+      method: "post",
+      url: BASE_URL + "/demo/phien",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      data: {
+        phien: phien,
+      },
+    });
+    window.phien = phien;
+  };
+
+  initData = async() => {
+    await axios({
+      method: "get",
+      url: BASE_URL + "/demo/init",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  end = async() => {
+    await axios({
+      method: "get",
+      url: BASE_URL + "/demo/end",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+    });
+  }
+  onStart = () => {
+    this.setState({ activeDrags: ++this.state.activeDrags });
+  };
+
+  onStop = () => {
+    this.setState({ activeDrags: --this.state.activeDrags });
+  };
+
+  showDemo = () => {
+    if (this.props.user.id && this.props.user.id == "29A000003")
+      this.setState({ showDemo: !this.state.showDemo });
+  };
 
   checkOtpCode = (password) => {
     this.otpPopup1.show();
@@ -181,6 +249,7 @@ class Header extends Component {
       this.props.user && this.props.user.username
         ? this.props.user
         : getCookie("userInfo");
+    const dragHandlers = { onStart: this.onStart, onStop: this.onStop };
     return (
       <div className="header">
         <img src={logo} alt="" />
@@ -277,7 +346,6 @@ class Header extends Component {
             errors={this.state.registerErrors}
           />
         </SkyLight>
-
         <SkyLight
           dialogStyles={changePasswordPopupStyle}
           hideOnOverlayClicked
@@ -294,6 +362,52 @@ class Header extends Component {
         >
           <InfoPopup info={this.props.user.info} />
         </SkyLight>
+        {this.props.user.id && this.props.user.id == "29A000003" && (
+          <Draggable handle="button" {...dragHandlers}>
+            <button className="draggable" onDoubleClick={this.showDemo}>
+              <div className="draggableText">+</div>
+              {this.state.showDemo && (
+                <div className="userMenu">
+                  <div
+                    class="userMenu--dropdown"
+                    style={{
+                      display: "block",
+                      left: "15px",
+                    }}
+                  >
+                    <div className="p-1">Phiên: {this.state.phien}</div>
+                    <hr />
+                    <span
+                      className="userMenu--dropdown__item"
+                      onClick={() => this.setPhien(1)}
+                    >
+                      Set phiên định kỳ mở
+                    </span>
+
+                    <span
+                      className="userMenu--dropdown__item"
+                      onClick={() => this.setPhien(2)}
+                    >
+                      Set phiên định kỳ đóng
+                    </span>
+                    <span
+                      className="userMenu--dropdown__item"
+                      onClick={() => this.setPhien(3)}
+                    >
+                      Set phiên liên tục
+                    </span>
+                    <span
+                      className="userMenu--dropdown__item"
+                      onClick={() => this.initData()}
+                    >
+                      Tạo dữ liệu
+                    </span>
+                  </div>
+                </div>
+              )}
+            </button>
+          </Draggable>
+        )}
       </div>
     );
   }

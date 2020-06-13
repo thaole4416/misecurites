@@ -106,12 +106,13 @@ async function register(req, res) {
     });
     taiKhoan
       .save()
-      .then((doc) => {
+      .then(async (doc) => {
         //gui mail url = url
         const soDu = new SoDuTien({
           maTaiKhoan: id,
           soDu: 0,
         });
+        await soDu.save()
         EmailHelper.sendMailConfirm(
           "ledinhthao131098@gmail.com",
           `${process.env.APP_URI}/api/taiKhoan/confirm/${isConfirm}`
@@ -197,6 +198,7 @@ async function test(req, res) {
   const confirm = req.params.confirm;
   const taiKhoan = await TaiKhoan.findOne({ isConfirm: confirm });
   if (taiKhoan) {
+    await TaiKhoan.findOneAndUpdate({_id: taiKhoan._id},{isConfirm: "true"})
     const user = {
       id: taiKhoan._id,
       email: taiKhoan.email,
@@ -217,7 +219,7 @@ async function test(req, res) {
     });
     try {
       res.cookie("userInfo", `${x}`, { maxAge: 900000 });
-      res.send("");
+      res.redirect('/');
     } catch (error) {
       console.log(error);
     }
