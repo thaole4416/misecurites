@@ -31,7 +31,7 @@ class OrderPopup extends Component {
       },
       type: "",
       recaptcha: "",
-      isBuy : false
+      isBuy: false,
     };
     this.recaptchaRef = React.createRef();
   }
@@ -70,7 +70,7 @@ class OrderPopup extends Component {
       this.recaptchaRef.current.reset();
     });
     emitter.on("danhMuctoOrder", (param) => {
-      const { symbol, isBuy , gia = "", khoiLuong = "" } = param;
+      const { symbol, isBuy, gia = "", khoiLuong = "" } = param;
       this.state.symbol.value = symbol;
       this.state.price.value = gia;
       this.state.volume.value = khoiLuong;
@@ -126,6 +126,24 @@ class OrderPopup extends Component {
     if (price < orderStock.value.floor) {
       this.state.price.errors.push("Giá không được nhỏ hơn giá sàn");
     }
+    if (orderStock.value.exchange == "HOSE" && price < 10000 && price % 10) {
+      this.state.price.errors.push("Giá chia hết cho 10");
+    }
+    if (
+      orderStock.value.exchange == "HOSE" &&
+      price >= 10000 &&
+      price < 50000 &&
+      price % 50
+    ) {
+      this.state.price.errors.push("Giá chia hết cho 50");
+    }
+    if (
+      (orderStock.value.exchange == "HOSE" && price > 50000 && price % 100) ||
+      (orderStock.value.exchange == "HOSE" && price % 100) ||
+      (orderStock.value.exchange == "UPCOM" && price % 100)
+    ) {
+      this.state.price.errors.push("Giá chia hết cho 100");
+    }
     this.setState((state) => ({ ...state }));
   };
 
@@ -137,6 +155,9 @@ class OrderPopup extends Component {
     this.state.volume = { value: volume, errors: [] };
     if (isBuy && price * volume > this.props.user.soDu) {
       this.state.volume.errors.push("Số dư không đủ");
+    }
+    if (volume < 10) {
+      this.state.volume.errors.push("Khối lượng lớn hơn hoặc bằng 10");
     }
     const soDu = this.props.user.danhMuc.find(
       (x) => x.maCoPhieu == this.state.symbol.value
@@ -152,7 +173,15 @@ class OrderPopup extends Component {
   };
 
   changeType = (event) => {
-    this.setState({ type: event.target.value });
+    if (["ATO", "ATC", "MP"].includes(event.target.value)) {
+      if (event.target.value == "ATO") this.state.price.value = "ATO";
+      else if (event.target.value == "ATC") this.state.price.value = "ATC";
+      else if (event.target.value == "MP") this.state.price.value = "MP";
+      this.setState({ ...this.state, type: event.target.value });
+    } else {
+      this.state.price.value = 0;
+      this.setState({ type: event.target.value });
+    }
   };
 
   handleSubmit = (event) => {
@@ -235,7 +264,16 @@ class OrderPopup extends Component {
           data-offstyle="danger"
           ref = {this.toggleRef}
         /> */}
-        <button className={this.state.isBuy ?  "toggle btn btn-danger" :"toggle btn btn-success"} onClick={()=> this.setState({isBuy : !this.state.isBuy})}>{this.state.isBuy ? "Bán" : "Mua"}</button>
+        <button
+          className={
+            this.state.isBuy
+              ? "toggle btn btn-danger"
+              : "toggle btn btn-success"
+          }
+          onClick={() => this.setState({ isBuy: !this.state.isBuy })}
+        >
+          {this.state.isBuy ? "Bán" : "Mua"}
+        </button>
         <hr />
         <div class="form-group">
           <input
@@ -265,15 +303,35 @@ class OrderPopup extends Component {
             TC: &nbsp;&nbsp;{orderStock.value.reference}
           </span>
         </div>
+        <div className="col-12 p-2">
+          <select
+            type="text"
+            className="form-control"
+            placeholder="Loại lệnh"
+            required="required"
+            value={type}
+            onChange={this.changeType}
+          >
+            {getOrderTypes(orderStock.value.exchange).map((type) => (
+              <option value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+        <hr />
         <div className="form-group">
           <div className="row">
             <div className="col-12 p-2">
               <input
-                type="number"
+                type={
+                  ["ATO", "ATC", "MP"].includes(price.value) ? "text" : "number"
+                }
                 className="form-control"
-                placeholder="Giá"
+                placeholder={
+                  ["ATO", "ATC", "MP"].includes(price.value) ? true : "Giá"
+                }
                 required="required"
                 value={price.value}
+                readOnly={["ATO", "ATC", "MP"].includes(type) ? true : false}
                 onChange={this.changePrice}
               />
               {price.errors.map((error) => (
@@ -292,20 +350,6 @@ class OrderPopup extends Component {
               {volume.errors.map((error) => (
                 <div className="text-danger p-2">{error}</div>
               ))}
-            </div>
-            <div className="col-12 p-2">
-              <select
-                type="text"
-                className="form-control"
-                placeholder="Loại lệnh"
-                required="required"
-                value={type}
-                onChange={this.changeType}
-              >
-                {getOrderTypes(orderStock.value.exchange).map((type) => (
-                  <option value={type} >{type}</option>
-                ))}
-              </select>
             </div>
           </div>
         </div>

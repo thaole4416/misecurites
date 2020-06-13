@@ -38,7 +38,7 @@ class Tbody extends Component {
 
   click = (symbol) => {
     this.setState({ symbol: symbol });
-    this.detailPopup.show();
+    // this.detailPopup.show();
   };
 
   render() {

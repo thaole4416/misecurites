@@ -29,9 +29,7 @@ async function KhopPhienDinhKy(req, res) {
         res.json(err);
       }
     }
-  } catch (error) {
-    
-  }
+  } catch (error) {}
 }
 
 async function dsGiaKhop(exchange, isATO = false) {
@@ -186,8 +184,11 @@ async function dsGiaKhop(exchange, isATO = false) {
     let dsBan = banAll.filter((x) => x.maCoPhieu == dataRow._id);
     let muaATX = muaATXAll.find((x) => x.maCoPhieu == dataRow._id);
     let banATX = banATXAll.find((x) => x.maCoPhieu == dataRow._id);
-    let giaThamChieu = coPhieus.find((x) => x._id == dataRow._id);
-
+    let giaThamChieu = coPhieus.find((x) => x._id == dataRow._id).giaThamChieu;
+    if (dsMua.length == 0 || dsBan.length == 0) {
+      dsGiaKhop[dataRow._id] = 0;
+      continue;
+    }
     let luyKeMuaObj = {};
     let luyKeMua = muaATX ? muaATX.tongKhoiLuong : 0;
     luyKeMuaObj[`${type}`] = luyKeMua;
@@ -219,8 +220,8 @@ async function dsGiaKhop(exchange, isATO = false) {
     if (obj.length == 1) {
       giaKhop = obj[0];
     } else if (obj.length >= 1) {
-      let ganVoiKhop = Math.min(...obj.map((x) => Math.abs(x - 10000)));
-      let xyz = obj.filter((x) => Math.abs(x - 10000) == ganVoiKhop);
+      let ganVoiKhop = Math.min(...obj.map((x) => Math.abs(x - giaThamChieu)));
+      let xyz = obj.filter((x) => Math.abs(x - giaThamChieu) == ganVoiKhop);
       if (xyz.length == 1) {
         giaKhop = xyz[0];
       } else if (xyz.length > 1) {
@@ -385,7 +386,7 @@ async function _doIt(exchange, isATO = false) {
     let dsBan = banAll.filter((x) => x.maCoPhieu == dataRow._id);
     let muaATX = muaATXAll.find((x) => x.maCoPhieu == dataRow._id);
     let banATX = banATXAll.find((x) => x.maCoPhieu == dataRow._id);
-    let giaThamChieu = coPhieus.find((x) => x._id == dataRow._id);
+    let giaThamChieu = coPhieus.find((x) => x._id == dataRow._id).giaThamChieu;
 
     let luyKeMuaObj = {};
     let luyKeMua = muaATX ? muaATX.tongKhoiLuong : 0;
@@ -396,7 +397,6 @@ async function _doIt(exchange, isATO = false) {
         : 0;
       luyKeMuaObj[dsGia[i]] = luyKeMua;
     }
-
     // tinh luy ke ban : ATO => thấp => cao
     let luyKeBanObj = {};
     let luyKeBan = banATX ? banATX.tongKhoiLuong : 0;
@@ -407,7 +407,6 @@ async function _doIt(exchange, isATO = false) {
         : 0;
       luyKeBanObj[dsGia[i]] = luyKeBan;
     }
-
     let obj = {};
     dsGia.map((x) => {
       obj[x] = Math.min(luyKeMuaObj[x], luyKeBanObj[x]);
@@ -418,8 +417,8 @@ async function _doIt(exchange, isATO = false) {
     if (obj.length == 1) {
       giaKhop = obj[0];
     } else if (obj.length >= 1) {
-      let ganVoiKhop = Math.min(...obj.map((x) => Math.abs(x - 10000)));
-      let xyz = obj.filter((x) => Math.abs(x - 10000) == ganVoiKhop);
+      let ganVoiKhop = Math.min(...obj.map((x) => Math.abs(x - giaThamChieu)));
+      let xyz = obj.filter((x) => Math.abs(x - giaThamChieu) == ganVoiKhop);
       if (xyz.length == 1) {
         giaKhop = xyz[0];
       } else if (xyz.length > 1) {
@@ -427,7 +426,6 @@ async function _doIt(exchange, isATO = false) {
       }
     }
     dsGiaKhop[dataRow._id] = giaKhop;
-    console.log(dsGiaKhop)
     let muaATXCP = await LenhGiaoDich.find({
       createdDay: TimeHelper.getToday(),
       loaiLenh: `mua ${type}`,
@@ -508,7 +506,6 @@ async function _doIt(exchange, isATO = false) {
         }
       }
     }
-
     muaATXCP = muaATXCP.map(function (x) {
       if (x.khoiLuongConLai == 0)
         return { ...x._doc, trangThai: "khớp toàn bộ" };
@@ -572,5 +569,5 @@ async function _doIt(exchange, isATO = false) {
 
 module.exports = {
   ATX: KhopPhienDinhKy,
-  dsGiaKhop: dsGiaKhop
+  dsGiaKhop: dsGiaKhop,
 };

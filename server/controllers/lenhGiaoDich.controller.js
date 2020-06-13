@@ -244,7 +244,7 @@ function clearAll(req, res) {
     .catch((err) => res.status(400).json("Error: " + err));
 }
 async function test(req, res) {
-  const maCoPhieu = "FPT";
+  const maCoPhieu = "SAM";
   let timestamp = Date.now();
   let data = [
     {
@@ -448,17 +448,6 @@ async function test(req, res) {
     {
       maTaiKhoan: req.userInfo.id,
       maCoPhieu: "MBB",
-      loaiLenh: "mua LO",
-      khoiLuong: 45000,
-      khoiLuongConLai: 45000,
-      gia: 42000,
-      trangThai: "đã xác nhận",
-      createdDay: TimeHelper.getToday(),
-      createdTime: timestamp,
-    },
-    {
-      maTaiKhoan: req.userInfo.id,
-      maCoPhieu: "MBB",
       loaiLenh: "bán LO",
       khoiLuong: 46000,
       khoiLuongConLai: 46000,
@@ -469,7 +458,8 @@ async function test(req, res) {
     },
   ];
   await LenhGiaoDich.collection.insertMany(data);
-  emitter.emit("getExchangeData");
+  emitter.emit("getExchangeDataOne",maCoPhieu);
+  emitter.emit("getExchangeDataOne","MBB");
   res.json("Thành công");
 }
 async function test2(req, res) {
@@ -676,18 +666,7 @@ async function test2(req, res) {
     },
     {
       maTaiKhoan: req.userInfo.id,
-      maCoPhieu: "MBB",
-      loaiLenh: "mua LO",
-      khoiLuong: 45000,
-      khoiLuongConLai: 45000,
-      gia: 42000,
-      trangThai: "đã xác nhận",
-      createdDay: TimeHelper.getToday(),
-      createdTime: timestamp,
-    },
-    {
-      maTaiKhoan: req.userInfo.id,
-      maCoPhieu: "MBB",
+      maCoPhieu: "",
       loaiLenh: "bán LO",
       khoiLuong: 46000,
       khoiLuongConLai: 46000,

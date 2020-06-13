@@ -89,14 +89,14 @@ class Menu extends Component {
 
   checkOtpCode = (order) => {
     this.otpPopup.show();
-    // this.props.genOtp(this.props.user.token);
+    this.props.genOtp(this.props.user.token);
     this.setState({ order });
   };
 
   verifyOtp = (otpCode, event) => {
     event.preventDefault();
-    emitter.emit(`verifySuccess`);
-    // this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
+    // emitter.emit(`verifySuccess`);
+    this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
   };
 
   clickHistory = () => {

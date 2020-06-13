@@ -111,8 +111,8 @@ class Header extends Component {
 
   verifyOtp = (otpCode, event) => {
     event.preventDefault();
-    emitter.emit(`verifySuccess1`);
-    // this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
+    // emitter.emit(`verifySuccess1`);
+    this.props.verifyOtp({ otpCode: otpCode, token: this.props.user.token });
   };
 
   async componentDidMount() {
@@ -150,7 +150,7 @@ class Header extends Component {
     window.phien = phien;
   };
 
-  initData = async() => {
+  initData = async () => {
     await axios({
       method: "get",
       url: BASE_URL + "/demo/init",
@@ -159,9 +159,9 @@ class Header extends Component {
         "Content-Type": "application/json",
       },
     });
-  }
+  };
 
-  end = async() => {
+  end = async () => {
     await axios({
       method: "get",
       url: BASE_URL + "/demo/end",
@@ -170,7 +170,7 @@ class Header extends Component {
         "Content-Type": "application/json",
       },
     });
-  }
+  };
   onStart = () => {
     this.setState({ activeDrags: ++this.state.activeDrags });
   };
@@ -186,7 +186,7 @@ class Header extends Component {
 
   checkOtpCode = (password) => {
     this.otpPopup1.show();
-    // this.props.genOtp(this.props.user.token);
+    this.props.genOtp(this.props.user.token);
     this.setState({ password });
   };
 
@@ -375,20 +375,20 @@ class Header extends Component {
                       left: "15px",
                     }}
                   >
-                    <div className="p-1">Phiên: {this.state.phien}</div>
+                    <div className="p-1">
+                      Phiên:{" "}
+                      {this.state.phien === 1
+                        ? this.state.phien === 3
+                          ? "liên tục"
+                          : "định kỳ"
+                        : ""}
+                    </div>
                     <hr />
                     <span
                       className="userMenu--dropdown__item"
                       onClick={() => this.setPhien(1)}
                     >
                       Set phiên định kỳ mở
-                    </span>
-
-                    <span
-                      className="userMenu--dropdown__item"
-                      onClick={() => this.setPhien(2)}
-                    >
-                      Set phiên định kỳ đóng
                     </span>
                     <span
                       className="userMenu--dropdown__item"

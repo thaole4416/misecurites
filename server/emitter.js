@@ -27,10 +27,12 @@ emitter.on("initData", async () => {
   // const tradingSession_HNX = TimeHelper.getTradingSession("HNX");
   // const tradingSession_UPCOM = TimeHelper.getTradingSession("UPCOM");
   if (tradingSession_HOSE == 1) {
-    await _initOrder(orderType.buy + " ATO", 5, "HOSE");
-    await _initOrder(orderType.buy + " ATO", 6, "HOSE");
-    await _initOrder(orderType.sell + " LO", 9, "HOSE");
-    await _initOrder(orderType.sell + " LO", 8, "HOSE");
+    for (let i = 0; i < 50; i++) {
+      if (Math.random()) await _initOrder(orderType.buy + " ATO", 1, "HOSE");
+      if (Math.random()) await _initOrder(orderType.sell + " ATO", 1, "HOSE");
+      if (Math.random()) await _initOrder(orderType.buy + " LO", 1, "HOSE");
+      if (Math.random()) await _initOrder(orderType.sell + " LO", 1, "HOSE");
+    }
   } else if (tradingSession_HOSE == 2) {
     await _initOrder(orderType.buy + " ATC", 3, "HOSE");
     await _initOrder(orderType.buy + " ATC", 4, "HOSE");
@@ -166,6 +168,7 @@ emitter.on("MatchOrder_MPX", async (param) => {
   if (lenhGiaoDich.loaiLenh.split(" ")[0] === "mua") {
     let lenhBans = await LenhGiaoDich.find({
       loaiLenh: "bán LO",
+      maCoPhieu: lenhGiaoDich.maCoPhieu,
       trangThai: { $nin: ["đã hủy, khớp hoàn toàn"] },
       khoiLuongConLai: { $ne: 0 },
       createdDay: TimeHelper.getToday(),
@@ -224,7 +227,10 @@ emitter.on("MatchOrder_MPX", async (param) => {
         break;
       }
     }
-    if (lenhGiaoDich.khoiLuongConLai > 0) {
+    if (
+      lenhGiaoDich.khoiLuongConLai > 0 &&
+      lenhGiaoDich.khoiLuongConLai < lenhGiaoDich.khoiLuong
+    ) {
       if (lenhGiaoDich.loaiLenh.split(" ")[1] === "MOK") {
         await LenhGiaoDich.updateOne(
           { _id: lenhGiaoDich._id },
@@ -293,7 +299,7 @@ emitter.on("MatchOrder_MPX", async (param) => {
           loaiLenh: "mua LO",
           khoiLuong: lenhGiaoDich.khoiLuongConLai,
           khoiLuongConLai: lenhGiaoDich.khoiLuongConLai,
-          gia: lenhGiaoDich.gia,
+          gia: lenhGiaoDich.gia * 1 + 100,
           trangThai: "đã xác nhận",
           createdDay: TimeHelper.getToday(),
           createdTime: Date.now(),
@@ -338,6 +344,7 @@ emitter.on("MatchOrder_MPX", async (param) => {
   } else if (lenhGiaoDich.loaiLenh.split(" ")[0] === "bán") {
     let lenhMuas = await LenhGiaoDich.find({
       loaiLenh: "mua LO",
+      maCoPhieu: lenhGiaoDich.maCoPhieu,
       trangThai: { $nin: ["đã hủy", "khớp hoàn toàn"] },
       khoiLuongConLai: { $ne: 0 },
       createdDay: TimeHelper.getToday(),
@@ -396,7 +403,10 @@ emitter.on("MatchOrder_MPX", async (param) => {
         break;
       }
     }
-    if (lenhGiaoDich.khoiLuongConLai > 0) {
+    if (
+      lenhGiaoDich.khoiLuongConLai > 0 &&
+      lenhGiaoDich.khoiLuongConLai < lenhGiaoDich.khoiLuong
+    ) {
       if (lenhGiaoDich.loaiLenh.split(" ")[1] === "MOK") {
         await LenhGiaoDich.updateOne(
           { _id: lenhGiaoDich._id },
@@ -438,11 +448,11 @@ emitter.on("MatchOrder_MPX", async (param) => {
         lenhGiaoDich.loaiLenh = "bán LO";
         lenhGiaoDich.createdTime = Date.now();
         if (giaMua * 1 < 10000) {
-          lenhGiaoDich.gia = `${giaMua * 1 + 10}`;
+          lenhGiaoDich.gia = `${giaMua * 1 - 10}`;
         } else if (giaMua * 1 >= 50000) {
-          lenhGiaoDich.gia = `${giaMua * 1 + 100}`;
+          lenhGiaoDich.gia = `${giaMua * 1 - 100}`;
         } else {
-          lenhGiaoDich.gia = `${giaMua * 1 + 50}`;
+          lenhGiaoDich.gia = `${giaMua * 1 - 50}`;
         }
         await LenhGiaoDich.create({
           maTaiKhoan: lenhGiaoDich.maTaiKhoan,
@@ -465,7 +475,7 @@ emitter.on("MatchOrder_MPX", async (param) => {
           loaiLenh: "bán LO",
           khoiLuong: lenhGiaoDich.khoiLuongConLai,
           khoiLuongConLai: lenhGiaoDich.khoiLuongConLai,
-          gia: lenhGiaoDich.gia,
+          gia: lenhGiaoDich.gia * 1 - 100,
           trangThai: "đã xác nhận",
           createdDay: TimeHelper.getToday(),
           createdTime: Date.now(),
@@ -514,8 +524,12 @@ emitter.on("getExchangeData", async function () {
   let stocksData_HOSE = await _getStockData("HOSE");
   let stocksData_HNX = await _getStockData("HNX");
   let stocksData_UPCOM = await _getStockData("UPCOM");
-  let stocksData = [...stocksData_HOSE, ...stocksData_HNX, ...stocksData_UPCOM];
-  emitter.emit("returnExchangeData", stocksData);
+  // let stocksData = [...stocksData_HOSE, ...stocksData_HNX, ...stocksData_UPCOM];
+  emitter.emit("returnExchangeData", [
+    ...stocksData_HOSE,
+    ...stocksData_HNX,
+    ...stocksData_UPCOM,
+  ]);
 });
 let _saveGiaoDichKhop = async function (
   maCoPhieu,
@@ -980,46 +994,48 @@ let _initOrder = async (type, size, exchange) => {
   const stocksList = await CoPhieu.find({ maSan: exchange });
   const khoiLuong = [1000, 1500, 2000, 2500, 3000];
   let timestamp = Date.now();
-  for (let i = 0; i < size; i++) {
-    let stockPosition = Math.round(Math.random() * (stocksList.length - 1));
-    let stockId = stocksList[stockPosition]._id;
-    let gia = RandomHelper.random(
-      stocksList[stockPosition].giaTran,
-      stocksList[stockPosition].giaSan
+  let stockPosition = Math.round(Math.random() * (stocksList.length - 1));
+  let stockId = stocksList[stockPosition]._id;
+  let gia = 0;
+  while (gia < 1000) {
+    gia = RandomHelper.random(
+      stocksList.find((x) => x._id === stockId).giaSan,
+      stocksList.find((x) => x._id === stockId).giaTran
     );
-    let khoiLuongRnd =
-      khoiLuong[Math.round(Math.random() * (khoiLuong.length - 1))];
-    let maTaiKhoanRnd =
-      maTaiKhoan[Math.round(Math.random() * (maTaiKhoan.length - 1))];
-
-    const lenhGiaoDich = new LenhGiaoDich({
-      maTaiKhoan: maTaiKhoanRnd,
-      maCoPhieu: stockId,
-      loaiLenh: type,
-      khoiLuong: khoiLuongRnd,
-      khoiLuongConLai: khoiLuongRnd,
-      gia: gia,
-      trangThai: "đã xác nhận",
-      createdDay: TimeHelper.getToday(),
-      createdTime: timestamp,
-    });
-    try {
-      let result = await lenhGiaoDich.save();
-      //neu la phien lien tuc thi moi match order
-      const tradingSession = TimeHelper.getTradingSession(exchange);
-      if (tradingSession == 1 || tradingSession == 2) {
-        emitter.emit("getExchangeDataOne", stockId);
-      } else if (tradingSession == 3) {
-        if (type.split(" ")[1] == "LO") {
-          emitter.emit("MatchOrder_LO", [stockId, gia, type]);
-        } else
-          emitter.emit("MatchOrder_MPX", {
-            lenhGiaoDich: result,
-          });
-      }
-    } catch (error) {
-      console.log(error);
+  }
+  let khoiLuongRnd =
+    khoiLuong[Math.round(Math.random() * (khoiLuong.length - 1))];
+  let maTaiKhoanRnd =
+    maTaiKhoan[Math.round(Math.random() * (maTaiKhoan.length - 1))];
+  if (type.split(" ")[1] == "ATO") gia = "ATO";
+  else if (type.split(" ")[1] == "ATC") gia = "ATC";
+  const lenhGiaoDich = new LenhGiaoDich({
+    maTaiKhoan: maTaiKhoanRnd,
+    maCoPhieu: stockId,
+    loaiLenh: type,
+    khoiLuong: khoiLuongRnd,
+    khoiLuongConLai: khoiLuongRnd,
+    gia: gia,
+    trangThai: "đã xác nhận",
+    createdDay: TimeHelper.getToday(),
+    createdTime: timestamp,
+  });
+  try {
+    let result = await lenhGiaoDich.save();
+    //neu la phien lien tuc thi moi match order
+    const tradingSession = TimeHelper.getTradingSession(exchange);
+    if (tradingSession == 1 || tradingSession == 2) {
+      emitter.emit("getExchangeDataOne", stockId);
+    } else if (tradingSession == 3) {
+      if (type.split(" ")[1] == "LO") {
+        emitter.emit("MatchOrder_LO", [stockId, gia, type]);
+      } else
+        emitter.emit("MatchOrder_MPX", {
+          lenhGiaoDich: result,
+        });
     }
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -1233,6 +1249,7 @@ let _getStockDataOne = async function (symbol) {
       exchange,
       TimeHelper.getTradingSession(exchange) == 1
     );
+    console.log(dsGiaKhop)
     stockData.match = dsGiaKhop[symbol] ? dsGiaKhop[symbol] : "";
     stockData.mVol = "";
     let tongKhop = tongKhopAll
@@ -1338,7 +1355,6 @@ let _getStockDataOne = async function (symbol) {
       // },
       // { $match: { tongKL: { $ne: 0 }, tongGT: { $ne: 0 } } },
     ]);
-    console.log("tongKhopAll", tongKhopAll);
     let stockData = {};
     let stockId = coPhieu._id;
     stockData.symbol = coPhieu._id;

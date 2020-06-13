@@ -58,7 +58,7 @@ function sendMailOtpCode(sendTo, otpCode, response) {
   var mailOptions = {
     from: "misecurities@gmail.com",
     to: sendTo,
-    subject: "Sending Email using Node.js[nodemailer]",
+    subject: "MISECURITIES",
     text: `Mật khẩu OTP của quý khách là ${otpCode}. `,
   };
   transporter.sendMail(mailOptions, function (error, info) {

@@ -114,7 +114,7 @@ async function register(req, res) {
         });
         await soDu.save()
         EmailHelper.sendMailConfirm(
-          "ledinhthao131098@gmail.com",
+          "khoaluanthao1@gmail.com",
           `${process.env.APP_URI}/api/taiKhoan/confirm/${isConfirm}`
         );
         res.json({ status: "OK", message: "Thêm thành công" });
